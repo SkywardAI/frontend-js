@@ -1,6 +1,12 @@
+* {
+    font-family: "Roboto", sans-serif;
+}
+
 body {
     margin: 0;
     padding: 0;
+
+    --side-bar-width: 60px;
 }
 
 div {
@@ -10,4 +16,23 @@ div {
 
 .clickable:hover {
     cursor: pointer;
+}
+
+#sidebar {
+    --side-bar-icon-size: calc(var(--side-bar-width) * 0.8);
+    
+    width: var(--side-bar-width);
+    border-right: 1px dashed gray;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+}
+
+#main {
+    width: calc(100vw - var(--side-bar-width));
+    height: 100vh;
+    position: fixed;
+    right: 0;
+    top: 0;
 }

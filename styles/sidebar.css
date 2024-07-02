@@ -1,0 +1,21 @@
+#sidebar .sidebar-icon {
+    width: var(--side-bar-icon-size);
+    height: var(--side-bar-icon-size);
+    margin: auto;
+    border-radius: 10px;
+    transition-duration: .5s;
+    display: flex;
+    align-items: center;
+}
+
+#sidebar .sidebar-icon.selected,
+#sidebar .sidebar-icon:hover {
+    background-color: lightgray;
+}
+
+
+#sidebar .sidebar-icon img {
+    width: 50%;
+    height: 50%;
+    margin: auto;
+}
