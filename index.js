@@ -8,6 +8,7 @@ function switchSelectedPage(page) {
     if(page === last_selected_page) return;
     document.getElementById('main').innerHTML = '';
     componetDismount && componetDismount();
+    componetDismount = null;
 
     switch(page) {
         case 'chat':
