@@ -11,11 +11,7 @@ const defaultConversationSetting = {
 }
 
 let currentConversation = {
-    ...defaultConversationSetting,
-    history: [
-        { type: 'out', message: 'hello world from me' },
-        { type: 'in', message: 'hello world from bot' },
-    ]
+    ...defaultConversationSetting
 }
 
 const { onmount, dismount, updateAll } = createHook();
@@ -30,7 +26,11 @@ export default function useConversation(updated) {
 
     function selectConversation(id, settings = null) {
         // TODO: query history by id
-        const history = [];
+        const history = [
+            { type: 'out', message: 'hello world from me' },
+            { type: 'in', message: 'hello world from bot' },
+            { type: 'out', message: 'this is a longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong sentence' },
+        ];
         currentConversation = {
             ...(settings || defaultConversationSetting), id, history
         }
