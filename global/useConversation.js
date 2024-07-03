@@ -2,7 +2,7 @@ import createHook from "./createHook.js";
 
 const defaultConversationSetting = {
     id: null,
-    temperature: '0.2',
+    temperature: 0.2,
     top_k: 40,
     top_p: 0.9,
     n_keep: null,
@@ -37,11 +37,13 @@ export default function useConversation(updated) {
         updateAll(currentConversation);
     }
 
-    function updateSetting(setting) {
+    async function updateSetting(setting) {
         currentConversation = {
             ...currentConversation,
             ...setting
         }
+        updateAll(currentConversation);
+        return true;
     }
 
     updated(currentConversation);
