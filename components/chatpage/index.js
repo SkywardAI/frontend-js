@@ -3,21 +3,18 @@ import createChatHistory from "./history.js";
 import createModelSettings from "./modelSettings.js";
 
 export default function createChatPage() {
-    const main = document.getElementById('main');
-    main.innerHTML = '';
-    
     const chatPage = document.createElement('div');
     chatPage.id = 'chat-page'
 
-    main.appendChild(chatPage);
+    document.getElementById('main').appendChild(chatPage);
 
-    const components_clear = []
+    const dismount_components = []
 
-    components_clear.push(createChatHistory(chatPage));
-    components_clear.push(createChatMain(chatPage));
-    components_clear.push(createModelSettings(chatPage));
+    dismount_components.push(createChatHistory(chatPage));
+    dismount_components.push(createChatMain(chatPage));
+    dismount_components.push(createModelSettings(chatPage));
 
     return () => {
-        components_clear.forEach(e=>e&&e());
+        dismount_components.forEach(e=>e&&e());
     }
 }

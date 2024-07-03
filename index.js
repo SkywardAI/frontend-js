@@ -2,16 +2,17 @@ import createChatPage from "./components/chatpage/index.js";
 import createSideBar from "./components/sidebar.js";
 
 let last_selected_page = '';
-let componentClear = null;
+let componetDismount = null;
 
 function switchSelectedPage(page) {
     if(page === last_selected_page) return;
-    componentClear && componentClear();
+    document.getElementById('main').innerHTML = '';
+    componetDismount && componetDismount();
 
     switch(page) {
         case 'chat':
         case 'default':
-            componentClear = createChatPage();
+            componetDismount = createChatPage();
             break;
     }
 

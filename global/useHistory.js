@@ -1,11 +1,6 @@
 const history = [
-    {name: 'New Conversation', createdAt: new Date().toUTCString()},
-    {name: 'New Conversation', createdAt: new Date().toUTCString()},
-    {name: 'New Conversation', createdAt: new Date().toUTCString()},
-    {name: 'New Conversation', createdAt: new Date().toUTCString()},
-    {name: 'New Conversation', createdAt: new Date().toUTCString()},
-    {name: 'New Conversation', createdAt: new Date().toUTCString()},
-    {name: 'New Conversation', createdAt: new Date().toUTCString()}
+    {id: 0, name: 'New Conversation', createdAt: new Date().toUTCString()},
+    {id: 1, name: 'New Conversation', createdAt: new Date().toUTCString()},
 ];
 let init = false;
 let updatesList = [];
@@ -37,7 +32,7 @@ export default function useHistory(updated) {
         init = false;
     }
 
-    function componentClear() {
+    function componetDismount() {
         updatesList = updatesList.filter(e=>e!==updated);
     }
 
@@ -49,5 +44,5 @@ export default function useHistory(updated) {
     // send history use callback function
     updated(history);
 
-    return { requestUpdateHistory, addHistory, clearHistory, componentClear }
+    return { requestUpdateHistory, addHistory, clearHistory, componetDismount }
 }
