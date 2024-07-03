@@ -8,9 +8,13 @@
     align-items: center;
 }
 
+#sidebar .sidebar-icon:first-child {
+    margin-top: 10px;
+}
+
 #sidebar .sidebar-icon.selected,
 #sidebar .sidebar-icon:hover {
-    background-color: lightgray;
+    background-color: var(--gray-bg);
 }
 
 
