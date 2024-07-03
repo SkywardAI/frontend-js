@@ -1,4 +1,9 @@
 #chat-page {
+
+    --history-width: 23%;
+    --main-width: 50%;
+    --settings-width: 27%;
+
     width: 100%;
     height: 100%;
     overflow: auto;
@@ -6,11 +11,20 @@
     top: 0;
     left: 0;
 }
+
+/* 
+=====================================================
+
+                    CHAT HISTORY
+
+=====================================================
+*/
 
 #chat-page #chat-history {
-    width: 25%;
+    --new-conversation-height: 50px;
+
+    width: var(--history-width);
     border-right: 1px dashed gray;
-    padding: 10px;
     height: 100%;
     position: absolute;
     left: 0;
@@ -18,29 +32,259 @@
     overflow: auto;
 }
 
-#chat-page #chat-history .ticket {
+#chat-page #chat-history .new-conversation {
     width: 100%;
-    min-height: 100px;
+    height: var(--new-conversation-height);
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom: 1px dashed lightgray;
+}
+
+#chat-page #chat-history .new-conversation .title {
+    --title-height: calc(var(--new-conversation-height) * 0.75);
+
+    width: 95%;
+    height: var(--title-height);
+    line-height: var(--title-height);
+    margin: auto;
+    transition-duration: .5s;
+    border-radius: 7px;
+    text-align: center;
+    border: 1px solid lightgray;
+}
+
+#chat-page #chat-history .tickets-list {
+    padding: 7px;
+    width: 100%;
+    height: calc(100% - var(--new-conversation-height));
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+#chat-page #chat-history .tickets-list .ticket {
+    width: 100%;
+    min-height: 90px;
     border-radius: 10px;
     padding: 10px;
     transition-duration: .5s;
 }
 
-#chat-page #chat-history .ticket:hover {
-    background-color: lightgray;
+#chat-page #chat-history .tickets-list .ticket.selected,
+#chat-page #chat-history .new-conversation .title:hover,
+#chat-page #chat-history .tickets-list .ticket:hover {
+    background-color: var(--gray-bg);
 }
 
-#chat-page #chat-history .ticket .title {
+#chat-page #chat-history .tickets-list .ticket .title {
     font-weight: 800;
     font-size: 22px;
 }
 
-#chat-page #chat-history .ticket .datetime {
+#chat-page #chat-history .tickets-list .ticket .datetime {
     font-size: 14px;
     color: gray;
 }
 
-#chat-page #chat-history .ticket .preview {
+#chat-page #chat-history .tickets-list .ticket .preview {
     margin-top: 5px;
     font-size: 17px;
+}
+
+/* 
+=====================================================
+
+                       CHAT MAIN
+
+=====================================================
+*/
+#chat-page #chat-main {
+    --send-section-size: 50px;
+    --leave-bottom: 15px;
+
+    width: var(--main-width);
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: var(--history-width);
+    border-right: 1px dashed gray;
+}
+
+#chat-page #chat-main #conversation-main {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - var(--send-section-size) - var(--leave-bottom) - 10px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block {
+    --avatar-size: 50px;
+    --avatar-margin: 10px;
+
+    width: 100%;
+    display: flex;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block .avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: var(--avatar-size);
+    background-color: var(--gray-bg);
+    margin-right: var(--avatar-margin);
+    overflow: hidden;
+    position: relative;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block .avatar img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block .content {
+    width: calc(100% - var(--avatar-margin) - var(--avatar-size));
+    height: fit-content;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block .content .sender-name {
+    color: gray;
+    margin-bottom: 10px;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block .content .message {
+    background-color: rgb(240, 240, 240);
+    border-radius: 10px;
+    width: fit-content;
+    max-width: 100%;
+    word-wrap: break-word;
+    height: fit-content;
+    padding: 20px;
+}
+
+#chat-page #chat-main #submit-chat {
+
+    --chat-input-width: 95%;
+
+    position: absolute;
+    width: var(--chat-input-width);
+    height: var(--send-section-size);
+    bottom: var(--leave-bottom);
+    left: calc((100% - var(--chat-input-width)) / 2);
+    overflow: hidden;
+}
+
+#chat-page #chat-main #submit-chat input {
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid gray;
+    height: 100%;
+    border-radius: 10px;
+    padding: 0px var(--send-section-size) 0px 15px;
+}
+#chat-page #chat-main #submit-chat input:focus { outline: none; }
+
+#chat-page #chat-main #submit-chat .send {
+    position: absolute;
+    right: 0;
+    width: var(--send-section-size);
+    height: var(--send-section-size);
+    display: flex;
+    align-items: center;
+}
+
+#chat-page #chat-main #submit-chat .send .submit-btn {
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    position: absolute;
+}
+
+#chat-page #chat-main #submit-chat .send .submit-icon {
+    z-index: 1;
+    width: 50%;
+    height: 50%;
+    margin: auto;
+    transform-origin: center;
+    transform: rotate(45deg);
+    color: dodgerblue;
+}
+
+/* 
+=====================================================
+
+                   MODEL SETTINGS
+
+=====================================================
+*/
+
+.model-settings {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: var(--settings-width);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.model-settings .title {
+    margin: 10px 20px;
+    font-size: 25px;
+    font-weight: bolder;
+}
+
+.model-settings .setting-section {
+    width: 100%;
+    padding: 15px 20px;
+}
+
+.model-settings .setting-section .title {
+    margin: unset;
+    margin-bottom: 7px;
+    font-size: 17px;
+    font-weight: unset;
+}
+
+.model-settings .setting-section input[type="text"] {
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 0px 10px;
+    border: 1px solid gray;
+    width: 50%;
+}
+.model-settings .setting-section input[type="text"]:focus {
+    outline: none;
+    border-width: 2px;
+}
+
+.model-settings .setting-section .combined-section {
+    --item-margin: 5px;
+    display: flex;
+    align-items: center;
+}
+.model-settings .setting-section .combined-section * { margin: auto; margin-right: var(--item-margin); }
+.model-settings .setting-section .combined-section *:last-child { margin-right: unset; }
+
+.model-settings .setting-section .combined-section.range {
+    width: 60%;
+}
+
+.model-settings .setting-section .combined-section.range input[type="range"] {
+    width: 75%;
+}
+.model-settings .setting-section .combined-section.range input[type="text"] {
+    width: 25%;
+    text-align: center;
 }
