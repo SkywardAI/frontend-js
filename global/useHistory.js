@@ -1,13 +1,12 @@
+import createHook from "./createHook.js";
+
 const history = [
     {id: 0, name: 'New Conversation', createdAt: new Date().toUTCString()},
     {id: 1, name: 'New Conversation', createdAt: new Date().toUTCString()},
 ];
 let init = false;
-let updatesList = [];
 
-function allUpdate() {
-    updatesList.forEach(e=>e(history));
-}
+const { onmount, dismount, updateAll } = createHook();
 
 /**
  * Hook for sync history
@@ -15,7 +14,7 @@ function allUpdate() {
  * @returns {Object} List of history operators
  */
 export default function useHistory(updated) {
-    updatesList.push(updated);
+    onmount(updated)
 
     async function requestUpdateHistory() {
         // fetch to update
@@ -24,16 +23,12 @@ export default function useHistory(updated) {
 
     function addHistory(new_ticket) {
         history.push(new_ticket);
-        allUpdate();
+        updateAll(history);
     }
 
     function clearHistory() {
         history.length = 0;
         init = false;
-    }
-
-    function componetDismount() {
-        updatesList = updatesList.filter(e=>e!==updated);
     }
 
     if(!init) {
@@ -44,5 +39,5 @@ export default function useHistory(updated) {
     // send history use callback function
     updated(history);
 
-    return { requestUpdateHistory, addHistory, clearHistory, componetDismount }
+    return { requestUpdateHistory, addHistory, clearHistory, componetDismount: dismount(updated) }
 }

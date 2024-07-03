@@ -1,3 +1,5 @@
+import createHook from "./createHook.js";
+
 const defaultConversationSetting = {
     id: null,
     temperature: '0.2',
@@ -15,17 +17,15 @@ let currentConversation = {
         { type: 'in', message: 'hello world from bot' },
     ]
 }
-let updatesList = [];
-function allUpdate() {
-    updatesList.forEach(e=>e(currentConversation));
-}
+
+const { onmount, dismount, updateAll } = createHook();
 
 export default function useConversation(updated) {
-    updatesList.push(updated);
+    onmount(updated);
 
     function addHistory(histories) {
         currentConversation.history.push(...histories);
-        allUpdate();
+        updateAll(currentConversation);
     }
 
     function selectConversation(id, settings = null) {
@@ -34,7 +34,7 @@ export default function useConversation(updated) {
         currentConversation = {
             ...(settings || defaultConversationSetting), id, history
         }
-        allUpdate();
+        updateAll(currentConversation);
     }
 
     function updateSetting(setting) {
@@ -44,9 +44,7 @@ export default function useConversation(updated) {
         }
     }
 
-    function componetDismount() {
-        updatesList = updatesList.filter(e=>e!==updated);
-    }
+    updated(currentConversation);
 
-    return { addHistory, selectConversation, updateSetting, componetDismount }
+    return { addHistory, selectConversation, updateSetting, componetDismount:dismount(updated) }
 }
