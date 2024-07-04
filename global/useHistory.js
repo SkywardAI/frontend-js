@@ -6,7 +6,7 @@ const history = [
 ];
 let init = false;
 
-const { onmount, dismount, updateAll } = createHook();
+const { onmount, remount, dismount, updateAll } = createHook();
 
 /**
  * Hook for sync history
@@ -14,7 +14,7 @@ const { onmount, dismount, updateAll } = createHook();
  * @returns {Object} List of history operators
  */
 export default function useHistory(updated) {
-    onmount(updated)
+    const mount_key = onmount(updated)
 
     async function requestUpdateHistory() {
         // fetch to update
@@ -39,5 +39,8 @@ export default function useHistory(updated) {
     // send history use callback function
     updated(history);
 
-    return { requestUpdateHistory, addHistory, clearHistory, componetDismount: dismount(updated) }
+    return { 
+        requestUpdateHistory, addHistory, clearHistory, 
+        componetDismount: dismount(mount_key), componentReMount:remount(mount_key) 
+    }
 }

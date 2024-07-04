@@ -14,10 +14,10 @@ let currentConversation = {
     ...defaultConversationSetting
 }
 
-const { onmount, dismount, updateAll } = createHook();
+const { onmount, remount, dismount, updateAll } = createHook();
 
 export default function useConversation(updated) {
-    onmount(updated);
+    const mount_key = onmount(updated);
 
     function addHistory(histories) {
         currentConversation.history.push(...histories);
@@ -48,5 +48,8 @@ export default function useConversation(updated) {
 
     updated(currentConversation);
 
-    return { addHistory, selectConversation, updateSetting, componetDismount:dismount(updated) }
+    return { 
+        addHistory, selectConversation, updateSetting,
+        componetDismount:dismount(mount_key), componentReMount:remount(mount_key) 
+    }
 }

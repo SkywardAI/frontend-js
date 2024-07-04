@@ -1,19 +1,37 @@
+import generateKey from "../tools/generateKey.js";
+
 export default function createHook() {
-    let updatesList = [];
+    let updatesList = {};
     
     function onmount(callback) {
-        updatesList.push(callback);
+        let new_key;
+        do {
+            new_key = generateKey();
+        } while(new_key in updatesList)
+        updatesList[new_key] = {callback, frozen: false};
+        return new_key;
     }
 
-    function dismount(callback) {
+    function remount(key) {
         return () => {
-            updatesList = updatesList.filter(e=>e!==callback);
+            const need_unfreeze = !updatesList[key].frozen
+            updatesList[key].frozen = false;
+            return need_unfreeze;
+        }
+    }
+
+    function dismount(key) {
+        return () => {
+            updatesList[key].frozen = true;
         }
     }
 
     function updateAll(value) {
-        updatesList.forEach(e=>e(value));
+        for(const key in updatesList) {
+            const {frozen, callback} = updatesList[key]
+            if(!frozen) callback(value);
+        }
     }
 
-    return { onmount, dismount, updateAll }
+    return { onmount, remount, dismount, updateAll }
 }

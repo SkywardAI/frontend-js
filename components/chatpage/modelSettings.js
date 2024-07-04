@@ -15,13 +15,14 @@ let
     temperature_range_elem, temperature_text_elem,
     top_k_elem, top_p_elem, n_keep_elem, n_predict_elem
 
-const { componentDismount, updateSetting } = useConversation(c=>{
-    console.log(c)
+const { componentDismount, updateSetting, componentReMount } = useConversation(c=>{
     settings = c;
     loadSettings();
 })
 
 export default function createModelSettings(main) {
+
+    componentReMount();
 
     main.insertAdjacentHTML("beforeend", `
     <div class='model-settings'>

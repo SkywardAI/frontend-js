@@ -3,12 +3,15 @@ import useHistory from "../../global/useHistory.js";
 
 let history = [], history_elem = null, last_selected_id;
 
-const { componetDismount:historyDismount } = useHistory(h=>{
+const { componetDismount:historyDismount, componentReMount: historyRemount } = useHistory(h=>{
     history = h;
     updateHistoryList();
 })
 
-const { selectConversation, componetDismount:conversationDismount } = useConversation(c=>{
+const { 
+    selectConversation, getCurrentConversation,
+    componetDismount:conversationDismount, componentReMount: conversationRemount 
+} = useConversation(c=>{
     if(c.id === null || c.id === last_selected_id) return;
     last_selected_id = c.id;
     
@@ -21,6 +24,11 @@ export default function createChatHistory(main) {
     history_elem = document.createElement('div');
     history_elem.id = 'chat-history';
     main.insertAdjacentElement('beforeend', history_elem);
+
+    // re-mount update listeners
+    historyRemount();
+    conversationRemount();
+
     updateHistoryList();
     return () => {
         historyDismount();
@@ -46,6 +54,7 @@ function updateHistoryList() {
     history.forEach(({id, name, createdAt}) => {
         const ticket = document.createElement('div')
         ticket.className = 'ticket clickable'
+        id === last_selected_id && ticket.classList.add('selected')
         ticket.id = `history-ticket-${id}`
         ticket.innerHTML = 
         `<div class='title'>${name}</div>
