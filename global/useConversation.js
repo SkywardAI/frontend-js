@@ -5,7 +5,6 @@ const defaultConversationSetting = {
     temperature: 0.2,
     top_k: 40,
     top_p: 0.9,
-    n_keep: null,
     n_predict: 128,
     history: []
 }
