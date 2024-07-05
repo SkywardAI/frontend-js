@@ -1,5 +1,8 @@
-import createChatPage from "./components/chat-page/index.js";
 import createSideBar from "./components/sidebar.js";
+import createChatPage from "./components/chat-page/index.js";
+import createAccountPage from "./components/account-page/index.js";
+import createTrainingPage from "./components/training-page/index.js";
+import createModelHeroPage from "./components/model-hero-page/index.js";
 
 let last_selected_page = '';
 let componetDismount = null;
@@ -11,8 +14,16 @@ function switchSelectedPage(page) {
     componetDismount = null;
 
     switch(page) {
-        case 'chat':
-        case 'default':
+        case 'account':
+            componetDismount = createAccountPage();
+            break;
+        case 'model-hero':
+            componetDismount = createModelHeroPage();
+            break;
+        case 'training':
+            componetDismount = createTrainingPage();
+            break;
+        case 'chat': default:
             componetDismount = createChatPage();
             break;
     }
@@ -22,6 +33,7 @@ function switchSelectedPage(page) {
     last_selected_page && document.getElementById(`sidebar-icon-${last_selected_page}`).classList.remove('selected');
     last_selected_page = page;
 }
+
 function build() {
     createSideBar(switchSelectedPage);
 }
