@@ -9,7 +9,7 @@ const { componetDismount:historyDismount, componentReMount: historyRemount } = u
 })
 
 const { 
-    selectConversation, getCurrentConversation,
+    selectConversation,
     componetDismount:conversationDismount, componentReMount: conversationRemount 
 } = useConversation(c=>{
     if(c.id === null || c.id === last_selected_id) return;
