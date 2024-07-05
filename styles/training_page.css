@@ -1,0 +1,46 @@
+.training-main {
+    padding: 20px;
+}
+
+.training-main .title {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.training-main .option-set {
+    display: flex;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.training-main .option-set .option-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.training-main .option-set select {
+    margin: 0px 50px;
+    width: 200px;
+    height: 35px;
+}
+
+.training-main .show-json-setting {
+    width: 500px;
+    height: 400px;
+    overflow: auto;
+    margin-top: 50px;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    font-size: 17px;
+}
+
+.training-main .save-btn {
+    margin-top: 20px;
+    width: 100px;
+    padding: 10px 20px;
+    border: 1px solid;
+    border-radius: 7px;
+    text-align: center;
+}
