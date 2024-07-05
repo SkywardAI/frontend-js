@@ -1,4 +1,4 @@
-import createChatPage from "./components/chatpage/index.js";
+import createChatPage from "./components/chat-page/index.js";
 import createSideBar from "./components/sidebar.js";
 
 let last_selected_page = '';
