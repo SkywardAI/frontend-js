@@ -1,4 +1,5 @@
 import { VERSION } from '../settings.js'
+import capitalizeFirstLetter from '../tools/capitalizeFirstLetter.js';
 
 export default function createInfoPage() {
     const icon = document.getElementById('sidebar-icon-info');
@@ -27,11 +28,7 @@ async function updateVersions() {
 
     for(const key in versions) {
         all_versions_elem.insertAdjacentHTML('beforeend',
-            `<div class='version-elem'>${firstLetterCapital(key)}: <span>v${versions[key]}</span></div>`
+            `<div class='version-elem'>${capitalizeFirstLetter(key)}: <span>v${versions[key]}</span></div>`
         )
     }
-}
-
-function firstLetterCapital(word) {
-    return `${word[0].toUpperCase()}${word.slice(1)}`
 }
