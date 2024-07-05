@@ -40,6 +40,7 @@ div {
     left: 0;
     top: 0;
     height: 100vh;
+    z-index: 2;
 }
 
 #main {
@@ -48,4 +49,5 @@ div {
     position: fixed;
     right: 0;
     top: 0;
+    z-index: 1;
 }

@@ -6,6 +6,7 @@
     transition-duration: .5s;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 #sidebar .sidebar-icon:first-child {
@@ -22,4 +23,71 @@
     width: 50%;
     height: 50%;
     margin: auto;
+}
+
+/* 
+=====================================================
+
+                    INFO PAGE
+
+=====================================================
+*/
+
+#all-versions:hover,
+#sidebar-icon-info:hover #all-versions {
+    transform: unset;
+    pointer-events: unset;
+}
+
+#all-versions {
+    width: fit-content;
+    height: fit-content;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    left: var(--side-bar-width);
+    border: 1px solid gray;
+    border-radius: 10px;
+    transition-duration: .5s;
+    transform-origin: left;
+    pointer-events: none;
+    transform: scaleX(0);
+    background-color: white;
+}
+
+#all-versions::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-bottom: 1px solid;
+    border-left: 1px solid;
+    border-color: inherit;
+    position: absolute;
+    left: -4px;
+    top: 20px;
+    transform: rotate(45deg);
+    background-color: white;
+}
+
+#all-versions .loading {
+    width: 20px !important;
+    height: 20px !important;
+    animation: rotateLoading 1s infinite linear;
+}
+
+@keyframes rotateLoading {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+}
+
+#all-versions .version-elem {
+    font-size: 17px;
+    margin-bottom: 3px;
+    text-wrap: nowrap;
+}
+#all-versions .version-elem:last-child { margin-bottom: unset; }
+
+#all-versions .version-elem span {
+    font-size: 15px;
+    font-weight: bold;
 }

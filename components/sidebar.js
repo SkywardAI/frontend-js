@@ -1,6 +1,11 @@
+import createInfoPage from "./info-page.js";
+
 const pages = [
-    { name: 'chat' },
-    { name: 'account', svgName: 'person' },
+    { name: 'chat', svgName: 'chat-dots-fill' },
+    { name: 'account', svgName: 'person-fill' },
+    { name: 'model-hero', svgName: 'hero' },
+    { name: 'training' },
+    { name: 'info', svgName: 'info-circle-fill', not_page: true }
 ]
 
 export default function createSideBar(switchSelectedPage) {
@@ -15,10 +20,13 @@ export default function createSideBar(switchSelectedPage) {
         `
     }).join('')}`
 
-    pages.forEach(({name}) => {
+    pages.forEach(({name, not_page}) => {
+        if(not_page) return;
+
         document.getElementById(`sidebar-icon-${name}`).onclick = 
         () => switchSelectedPage(name);
     })
+    createInfoPage();
 
     switchSelectedPage(pages[0].name);
 }
