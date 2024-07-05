@@ -1,0 +1,69 @@
+.model-hero #available-models {
+    width: 200px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-right: 1px dashed gray;
+}
+
+.model-hero #models-playground {
+    width: calc(100% - 200px);
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.model-hero .model-block {
+    width: fit-content;
+    height: fit-content;
+    padding: 10px 30px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    min-width: 150px;
+    position: relative;
+}
+
+.model-block .model-title {
+    font-size: 18px;
+    margin: 5px 0px;
+}
+
+.model-block .param-input {
+    width: 150px;
+    height: 30px;
+    padding: 0px 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+.model-block .remove-model {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.model-block.linear { background-color: beige; }
+.model-block.dropout { background-color: aliceblue; }
+.model-block.softmax { background-color: lavenderblush; }
+
+.model-hero #available-models .model-block {
+    margin: auto;
+    margin-top: 20px;
+    box-shadow: 3px 3px 5px gray;
+}
+
+#finish-build {
+    margin: auto;
+    width: 130px;
+    height: fit-content;
+    padding: 10px 20px;
+    margin-top: 30px;
+    border: 3px inset gray;
+    border-radius: 30px;
+    text-align: center;
+    background-color: azure;
+}
