@@ -29,7 +29,7 @@ export default function createHook() {
     function updateAll(value) {
         for(const key in updatesList) {
             const {frozen, callback} = updatesList[key]
-            if(!frozen) callback(value);
+            if(!frozen && callback) callback(value);
         }
     }
 

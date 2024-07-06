@@ -9,10 +9,10 @@ const { componetDismount:historyDismount, componentReMount: historyRemount } = u
 })
 
 const { 
-    selectConversation,
+    selectConversation, startNewConversation,
     componetDismount:conversationDismount, componentReMount: conversationRemount 
 } = useConversation(c=>{
-    if(c.id === null || c.id === last_selected_id) return;
+    if(c.id === 'not_selected' || c.id === last_selected_id) return;
     last_selected_id = c.id;
     
     const last_selected = document.querySelector('#chat-history .tickets-list .ticket.selected')
@@ -43,6 +43,7 @@ function updateHistoryList() {
         const new_conversation = document.createElement('div')
         new_conversation.className = 'new-conversation clickable'
         new_conversation.innerHTML="<div class='title'>Start a new conversation</div>"
+        new_conversation.onclick = startNewConversation;
         history_elem.appendChild(new_conversation);
     } else {
         history_elem.lastChild.remove();

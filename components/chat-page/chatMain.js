@@ -2,8 +2,11 @@ import useConversation from "../../global/useConversation.js";
 
 let conversation = {}, main_elem, init = false;
 
-const { componentDismount } = useConversation(c=>{
+const { componentDismount, sendMessage } = useConversation(c=>{
     conversation = c;
+    if(conversation.id !== 'not_selected') {
+        buildForm();
+    }
     updateConversation();
 })
 
@@ -11,13 +14,7 @@ export default function createChatMain(main) {
     main.insertAdjacentHTML('beforeend', `
     <div id='chat-main'>
         <div id='conversation-main'></div>
-        <form id='submit-chat' autocomplete="off">
-            <input type='text' name='send-content' placeholder='Ask anything here!'>
-            <div class='send'>
-                <input type='submit' class='submit-btn clickable'>
-                <img class='submit-icon' src='/medias/send.svg'>
-            </div>
-        </form>
+        <form id='submit-chat' autocomplete="off"></form>
     </div>`)
 
     document.getElementById('submit-chat').onsubmit=submitContent;
@@ -28,11 +25,21 @@ export default function createChatMain(main) {
     return componentDismount;
 }
 
+function buildForm() {
+    document.getElementById('submit-chat').innerHTML = `
+    <input type='text' name='send-content' placeholder='Ask anything here!'>
+    <div class='send'>
+        <input type='submit' class='submit-btn clickable'>
+        <img class='submit-icon' src='/medias/send.svg'>
+    </div>`;
+    const hello;
+}
+
 function submitContent(evt) {
     evt.preventDefault();
 
     const content = evt.target['send-content'].value;
-    console.log(content);
+    sendMessage(content);
     evt.target['send-content'].value = ''
 }
 
