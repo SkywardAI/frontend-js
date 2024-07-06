@@ -32,7 +32,6 @@ function buildForm() {
         <input type='submit' class='submit-btn clickable'>
         <img class='submit-icon' src='/medias/send.svg'>
     </div>`;
-    const hello;
 }
 
 function submitContent(evt) {
