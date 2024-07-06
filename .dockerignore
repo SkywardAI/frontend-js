@@ -1,0 +1,11 @@
+.devcontainer
+.git
+.github
+.vscode
+.gitignore
+Dockerfile
+README.md
+node_modules
+package-lock.json
+package.json
+eslint.config.js
