@@ -123,6 +123,16 @@
     padding: 20px;
 }
 
+#chat-page #chat-main #conversation-main .greeting {
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    margin-top: 30%;
+    color: gray;
+    font-size: 20px;
+    user-select: none;
+}
+
 #chat-page #chat-main #conversation-main .conversation-block {
     --avatar-size: 50px;
     --avatar-margin: 10px;
@@ -143,6 +153,11 @@
     position: relative;
 }
 
+#chat-page #chat-main #conversation-main .conversation-block.sender-out .avatar {
+    margin-right: unset;
+    margin-left: var(--avatar-margin);
+}
+
 #chat-page #chat-main #conversation-main .conversation-block .avatar img {
     width: 100%;
     height: 100%;
@@ -159,6 +174,7 @@
 #chat-page #chat-main #conversation-main .conversation-block .content .sender-name {
     color: gray;
     margin-bottom: 10px;
+    position: relative;
 }
 
 #chat-page #chat-main #conversation-main .conversation-block .content .message {
@@ -169,6 +185,24 @@
     word-wrap: break-word;
     height: fit-content;
     padding: 20px;
+    position: relative;
+}
+
+#chat-page #chat-main #conversation-main 
+.conversation-block.sender-out .content {
+    text-align: right;
+}
+
+#chat-page #chat-main #conversation-main 
+.conversation-block.sender-out .content .message {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+#chat-page #chat-main #conversation-main .conversation-block .content .message .loading {
+    animation: rotateLoading 1s infinite linear;
+    width: 20px;
+    height: 20px;
 }
 
 #chat-page #chat-main #submit-chat {

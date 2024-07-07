@@ -29,7 +29,8 @@ export default function useConversation(updated) {
     }
 
     function startNewConversation() {
-        currentConversation = defaultConversationSetting;
+        currentConversation.id = null;
+        currentConversation.history = [];
         updateAll(currentConversation);
     }
 

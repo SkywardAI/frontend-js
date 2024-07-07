@@ -51,3 +51,9 @@ div {
     top: 0;
     z-index: 1;
 }
+
+
+@keyframes rotateLoading {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+}

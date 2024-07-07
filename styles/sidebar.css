@@ -75,11 +75,6 @@
     animation: rotateLoading 1s infinite linear;
 }
 
-@keyframes rotateLoading {
-    from { transform: rotate(0); }
-    to { transform: rotate(360deg); }
-}
-
 #all-versions .version-elem {
     font-size: 17px;
     margin-bottom: 3px;
