@@ -1,5 +1,6 @@
 import { VERSION } from '../settings.js'
 import capitalizeFirstLetter from '../tools/capitalizeFirstLetter.js';
+import request from '../tools/request.js';
 
 export default function createInfoPage() {
     const icon = document.getElementById('sidebar-icon-info');
@@ -13,14 +14,12 @@ export default function createInfoPage() {
 }
 
 async function updateVersions() {
-    await new Promise(s=>setTimeout(s, 5000));
-    
+
+    const query_versions = await (await request('version')).json();
+
     const versions = {
-        rebel: VERSION,
-        kirin: '0.1.8',
-        some: '1.2.3',
-        random: '3.4.5',
-        version: '4.5.6'
+        rebel: `v${VERSION}`,
+        ...query_versions
     };
 
     const all_versions_elem = document.getElementById('all-versions');
@@ -28,7 +27,7 @@ async function updateVersions() {
 
     for(const key in versions) {
         all_versions_elem.insertAdjacentHTML('beforeend',
-            `<div class='version-elem'>${capitalizeFirstLetter(key)}: <span>v${versions[key]}</span></div>`
+            `<div class='version-elem'>${capitalizeFirstLetter(key)}: <span>${versions[key]}</span></div>`
         )
     }
 }
