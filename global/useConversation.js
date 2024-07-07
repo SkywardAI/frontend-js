@@ -1,7 +1,6 @@
-import apiAddress from "../tools/apiAddress.js";
+import request from "../tools/request.js";
 import createHook from "./createHook.js";
 import useHistory from "./useHistory.js";
-import useSessionId from "./useSessionId.js";
 
 const defaultConversationSetting = {
     id: null,
@@ -16,15 +15,10 @@ let currentConversation = {
     ...defaultConversationSetting,
     id: 'not_selected'
 };
-let currentSession;
 
 
 const { onmount, remount, dismount, updateAll } = createHook();
 const { addHistory:addUserHistoryTicket } = useHistory(null);
-
-useSessionId(id=>{
-    currentSession = id;
-})
 
 export default function useConversation(updated) {
     const mount_key = onmount(updated);
@@ -42,19 +36,15 @@ export default function useConversation(updated) {
     async function sendMessage(message) {
         addHistory([{ type: 'out', message }]);
 
-        const { sessionUuid, message:botResponse } = await (await fetch(apiAddress('chat'), {
+        const { sessionUuid, message:botResponse } = 
+        await (await request('chat', {
             method: 'POST',
-            signal: AbortSignal.timeout(5000),
-            headers: {
-                authenticated: currentSession
-            },
             body: {
-                sessionUuid: currentConversation.id,
+                sessionUuid: currentConversation.id || "uuid",
                 message
             }
         })).json()
 
-        addHistory([{type: 'in', message: botResponse}])
         if(currentConversation.id === null) {
             addUserHistoryTicket({
                 id: sessionUuid, name: 'New Conversation', 
@@ -62,11 +52,12 @@ export default function useConversation(updated) {
             })
             currentConversation.id = sessionUuid;
         }
+        addHistory([{type: 'in', message: botResponse}])
     }
 
     async function selectConversation(id, settings = null) {
         const conversation_history = [];
-        await (await fetch(apiAddress(`chat/history/${id}`)))
+        await (await request(`chat/history/${id}`))
         .json().forEach(({type, message})=>{
             conversation_history.push({type, message});
         })

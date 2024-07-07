@@ -12,7 +12,7 @@ const {
     selectConversation, startNewConversation,
     componetDismount:conversationDismount, componentReMount: conversationRemount 
 } = useConversation(c=>{
-    if(c.id === 'not_selected' || c.id === last_selected_id) return;
+    if(c.id === 'not_selected' || c.id === null || c.id === last_selected_id) return;
     last_selected_id = c.id;
     
     const last_selected = document.querySelector('#chat-history .tickets-list .ticket.selected')

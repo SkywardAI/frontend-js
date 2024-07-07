@@ -1,4 +1,4 @@
-import apiAddress from "../tools/apiAddress.js";
+import request from "../tools/request.js";
 import createHook from "./createHook.js";
 
 let currentSession = null, init = false;
@@ -9,7 +9,7 @@ export default function useSessionId(updated) {
     const mount_key = onmount(updated)
 
     async function genSession() {
-        const { token } = await (await fetch(apiAddress('auth/token'), { mode: 'no-cors' })).json();
+        const { token } = await (await request('auth/token')).json()
         currentSession = token;
         updateAll(currentSession);
     }

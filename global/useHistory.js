@@ -1,4 +1,4 @@
-import apiAddress from "../tools/apiAddress.js";
+import request from "../tools/request.js";
 import createHook from "./createHook.js";
 import useSessionId from "./useSessionId.js";
 
@@ -23,11 +23,9 @@ export default function useHistory(updated) {
     const mount_key = onmount(updated)
 
     async function requestUpdateHistory() {
-        const chat_history = await (await fetch(apiAddress('chat/'), {
-            headers: {
-                authenticated: currentSession
-            }
-        })).json();
+        if(!currentSession) return;
+        
+        const chat_history = await (await request('chat')).json();
 
         history.length = 0;
         chat_history.forEach(({sessionUuid, name, createdAt}) => {
