@@ -14,10 +14,6 @@ OR
 > npm install serve\
 > serve --cors
 
-OR\
-Run by python3:
-> python3 -m http.server
-
 And access ports relatively
 ## Code Lint
 **Please do code lint first before you push!**\
