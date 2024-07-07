@@ -40,12 +40,11 @@ export default function useConversation(updated) {
         await (await request('chat', {
             method: 'POST',
             body: {
-                sessionUuid: currentConversation.id || "",
+                sessionUuid: currentConversation.id || "uuid",
                 message
             }
         })).json()
 
-        addHistory([{type: 'in', message: botResponse}])
         if(currentConversation.id === null) {
             addUserHistoryTicket({
                 id: sessionUuid, name: 'New Conversation', 
@@ -53,6 +52,7 @@ export default function useConversation(updated) {
             })
             currentConversation.id = sessionUuid;
         }
+        addHistory([{type: 'in', message: botResponse}])
     }
 
     async function selectConversation(id, settings = null) {
