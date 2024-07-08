@@ -1,20 +1,11 @@
 import { API_ADDRESS } from "../settings.js";
 import useSessionId from "../global/useSessionId.js";
-import { fetchEventSource } from 'https://cdn.jsdelivr.net/npm/@microsoft/fetch-event-source@2.0.1/+esm'
 
 let session_id = '';
 useSessionId(id=>{session_id = id});
 
 export default function request(url, options={}) {
     return fetch(reqAddress(url), generateRequest(url, options))
-}
-
-export function streamRequest(url, options={}, onmessage) {
-    return fetchEventSource(reqAddress(url), {
-        ...generateRequest(url, options),
-        onmessage,
-        signal: AbortSignal.timeout(5000)
-    })
 }
 
 export function reqAddress(url) {

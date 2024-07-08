@@ -1,5 +1,5 @@
 import useConversation from "../../global/useConversation.js";
-import request, { streamRequest } from "../../tools/request.js";
+import request from "../../tools/request.js";
 
 let conversation = {}, main_elem;
 
@@ -8,7 +8,7 @@ const {
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
     if(c.id === conversation.id) return;
-    conversation = {...c};
+    conversation = c;
     if(!conversation.id) return;
 
     updateConversation();
@@ -65,8 +65,14 @@ async function sendMessage(message, send) {
     main_elem.appendChild(createBlock('out', message)[0]);
     const [bot_answer, bot_answer_message] = createBlock('in');
     main_elem.appendChild(bot_answer);
+    bot_answer.focus();
 
-    const content = await send(bot_answer_message);
+    const response = await request('chat', {
+        method: 'POST',
+        body: { sessionUuid: conversation.id || "uuid", message }
+    })
+
+    const content = await send(response, bot_answer_message);
 
     appendConversationMessage([
         { type: 'out', message },
@@ -75,12 +81,7 @@ async function sendMessage(message, send) {
 }
 
 function sendMessageWaiting(msg) {
-    return sendMessage(msg, async pending_elem => {
-        const response = await request('chat', {
-            method: 'POST',
-            body: { sessionUuid: conversation.id || "uuid", message }
-        })
-
+    return sendMessage(msg, async (response, pending_elem) => {
         const { message } = await response.json();
         pending_elem.textContent = message;
         return message;
@@ -88,20 +89,27 @@ function sendMessageWaiting(msg) {
 }
 
 async function sendMessageStream(msg) {
-    return sendMessage(msg, async pending_elem => {
+    return sendMessage(msg, async (response, pending_elem) => {
         let resp_content = ''
-        await streamRequest('chat', {
-            method: 'POST',
-            body: {
-                sessionUuid: conversation.id,
-                message: msg
+        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        let pending_content = ''
+        while(true) {
+            const {value, done} = await reader.read();
+            if(done) break;
+            pending_content += value;
+            if(pending_content.includes('\n\n')) {
+                const splitted_content = pending_content.split('\n\n')
+                try {
+                    const json = JSON.parse(splitted_content.shift().replace('data: ', ''))
+                    resp_content += json.content;
+                    pending_elem.textContent = resp_content;
+                    pending_content = splitted_content.join('')
+                    if(json.stop) break;
+                } catch(error) {
+                    console.error(error);
+                }
             }
-        }, res=>{
-            const { content } = JSON.parse(res.data);
-            resp_content += content;
-            pending_elem.textContent = resp_content;
-        })
-        return resp_content;
+        }
     })
 }
 

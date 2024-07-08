@@ -13,7 +13,8 @@ const defaultConversationSetting = {
 }
 
 let currentConversation = {
-    ...defaultConversationSetting
+    ...defaultConversationSetting,
+    history: []
 };
 
 const { onmount, remount, dismount, updateAll } = createHook();
@@ -26,7 +27,7 @@ export default function useConversation(updated) {
         const { sessionUuid } = await (await request('chat/seesionuuid')).json();
         currentConversation = {
             ...defaultConversationSetting,
-            id: sessionUuid
+            id: sessionUuid, history: []
         };
         addHistory({
             id: currentConversation.id,
