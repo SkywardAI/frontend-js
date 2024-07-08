@@ -1,7 +1,7 @@
 import useConversation from "../../global/useConversation.js";
 import request from "../../tools/request.js";
 
-let conversation = {}, main_elem, init = false;
+let conversation = {}, main_elem;
 
 const { 
     componentDismount, componentReMount, 
@@ -20,8 +20,6 @@ const {
 })
 
 export default function createChatMain(main) {
-    componentReMount();
-
     main.insertAdjacentHTML('beforeend', `
     <div id='chat-main'>
         <div id='conversation-main'>
@@ -34,7 +32,11 @@ export default function createChatMain(main) {
 
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
-    init = true;
+
+    if(componentReMount()) {
+        updateConversation();
+        buildForm();
+    }
 
     return componentDismount;
 }
@@ -114,7 +116,7 @@ function sendMessageStream(msg) {
 }
 
 function updateConversation() {
-    if(!init || !conversation.history.length) return;
+    if(!conversation.history || !conversation.history.length) return;
 
     main_elem.innerHTML = ''
     conversation.history.forEach(({type, message})=>{
