@@ -3,7 +3,6 @@ import useConversation from "../../global/useConversation.js";
 let conversation = {}, main_elem, init = false;
 
 const { componentDismount, sendMessage } = useConversation(c=>{
-    console.log(c)
     conversation = c;
     if(conversation.id === null) {
         const conversation_main = document.getElementById('conversation-main');

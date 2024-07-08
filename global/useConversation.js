@@ -29,8 +29,7 @@ export default function useConversation(updated) {
     }
 
     function startNewConversation() {
-        currentConversation.id = null;
-        currentConversation.history = [];
+        currentConversation = structuredClone(defaultConversationSetting);
         updateAll(currentConversation);
     }
 
