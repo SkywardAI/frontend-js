@@ -14,7 +14,7 @@ export default function createHook() {
 
     function remount(key) {
         return () => {
-            const need_unfreeze = !updatesList[key].frozen
+            const need_unfreeze = updatesList[key].frozen
             updatesList[key].frozen = false;
             return need_unfreeze;
         }

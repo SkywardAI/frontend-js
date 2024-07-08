@@ -15,6 +15,6 @@ export default function createChatPage() {
     dismount_components.push(createModelSettings(chatPage));
 
     return () => {
-        dismount_components.forEach(e=>e&&e());
+        dismount_components.forEach(e=>e());
     }
 }

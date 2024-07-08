@@ -11,7 +11,7 @@ const fields = {
     n_predict: { title: 'N-Predict', valueRange: { min: 0, max: 128 } }
 }
 
-const { componentDismount, updateSetting, componentReMount } = useConversation(c=>{
+const { componetDismount, updateSetting, componentReMount } = useConversation(c=>{
     settings = c;
     loadSettings();
 })
@@ -47,7 +47,7 @@ export default function createModelSettings(main) {
 
     init = true;
     loadSettings();
-    return componentDismount;
+    return componetDismount;
 }
 
 function loadSettings() {

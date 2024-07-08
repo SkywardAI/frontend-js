@@ -131,6 +131,7 @@
     color: gray;
     font-size: 20px;
     user-select: none;
+    max-width: 80%;
 }
 
 #chat-page #chat-main #conversation-main .conversation-block {

@@ -1,33 +1,40 @@
 import useConversation from "../../global/useConversation.js";
+import request from "../../tools/request.js";
 
-let conversation = {}, main_elem, init = false;
+let conversation = {}, main_elem;
 
-const { componentDismount, sendMessage } = useConversation(c=>{
-    console.log(c)
+const { 
+    componetDismount, componentReMount, 
+    sendMessage:appendConversationMessage 
+} = useConversation(c=>{
+    if(c.id === conversation.id) return;
     conversation = c;
-    if(conversation.id === null) {
-        const conversation_main = document.getElementById('conversation-main');
-        if(conversation_main) conversation_main.innerHTML = "<div class='greeting'>Hi, how can I help you today?</div>"
-    }
-    if(conversation.id !== 'not_selected') {
-        buildForm();
-    }
+    if(!conversation.id) return;
+
     updateConversation();
+    buildForm();
 })
 
 export default function createChatMain(main) {
     main.insertAdjacentHTML('beforeend', `
     <div id='chat-main'>
-        <div id='conversation-main'><div class='greeting'>Please select a ticket or start a new conversation on left.</div></div>
+        <div id='conversation-main'>
+            <div class='greeting'>
+                Please select a ticket or start a new conversation on left.
+            </div>
+        </div>
         <form id='submit-chat' autocomplete="off"></form>
     </div>`)
 
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
-    init = true;
-    updateConversation();
 
-    return componentDismount;
+    if(componentReMount() && conversation.id) {
+        updateConversation();
+        buildForm();
+    }
+
+    return componetDismount;
 }
 
 function buildForm() {
@@ -43,21 +50,83 @@ function submitContent(evt) {
     evt.preventDefault();
 
     const content = evt.target['send-content'].value;
-    content && sendMessage(content);
+    content && (
+        conversation.stream_response ? 
+        sendMessageStream(content) : 
+        sendMessageWaiting(content)
+    )
     evt.target['send-content'].value = ''
 }
 
+async function sendMessage(message, send) {
+    if(!conversation.history.length) {
+        main_elem.innerHTML = ''
+    }
+    main_elem.appendChild(createBlock('out', message)[0]);
+    const [bot_answer, bot_answer_message] = createBlock('in');
+    main_elem.appendChild(bot_answer);
+    bot_answer.focus();
+
+    const response = await request('chat', {
+        method: 'POST',
+        body: { sessionUuid: conversation.id || "uuid", message }
+    })
+
+    const content = await send(response, bot_answer_message);
+
+    appendConversationMessage([
+        { type: 'out', message },
+        { type: 'in', message: content}
+    ], conversation.id)
+}
+
+function sendMessageWaiting(msg) {
+    return sendMessage(msg, async (response, pending_elem) => {
+        const { message } = await response.json();
+        pending_elem.textContent = message;
+        return message;
+    })
+}
+
+async function sendMessageStream(msg) {
+    return sendMessage(msg, async (response, pending_elem) => {
+        let resp_content = ''
+        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        let pending_content = ''
+        while(true) {
+            const {value, done} = await reader.read();
+            if(done) break;
+            pending_content += value;
+            if(pending_content.includes('\n\n')) {
+                const splitted_content = pending_content.split('\n\n')
+                try {
+                    const json = JSON.parse(splitted_content.shift().replace('data: ', ''))
+                    resp_content += json.content;
+                    pending_elem.textContent = resp_content;
+                    pending_content = splitted_content.join('')
+                    if(json.stop) break;
+                } catch(error) {
+                    console.error(error);
+                }
+            }
+        }
+    })
+}
+
 function updateConversation() {
-    if(!init || !conversation.history.length) return;
+    if(!conversation.history) return;
+    if(!conversation.history.length && main_elem) {
+        main_elem.innerHTML = "<div class='greeting'>Hi, how can I help you today?</div>"
+        return;
+    }
 
     main_elem.innerHTML = ''
     conversation.history.forEach(({type, message})=>{
-        const block = createBlock(type, message);
-        main_elem.appendChild(block)
+        main_elem.appendChild(createBlock(type, message)[0])
     })
 
     if(conversation.history.slice(-1)[0].type === 'out') {
-        main_elem.appendChild(createBlock('in'))
+        main_elem.appendChild(createBlock('in')[0])
     }
 }
 
@@ -65,15 +134,19 @@ function createBlock(type, message=null) {
     const block = document.createElement('div');
     block.className = `conversation-block sender-${type}`;
 
-    block.innerHTML = `
-    <div class='content'>
-        <div class='sender-name'>
-            From: ${type === 'in' ? 'AI' : 'You'}
-        </div>
-        <div class='message'>
-            ${message || "<img class='loading' src='/medias/arrow-clockwise.svg'>"}
-        </div>
+    const content = document.createElement('div')
+    content.className = 'content';
+    content.innerHTML = `
+    <div class='sender-name'>
+        From: ${type === 'in' ? 'AI' : 'You'}
     </div>`
+
+    const message_elem = document.createElement('div');
+    message_elem.className = 'message';
+    message_elem.innerHTML = message || "<img class='loading' src='/medias/arrow-clockwise.svg'>"
+
+    content.insertAdjacentElement("beforeend", message_elem);
+    block.appendChild(content);
 
     const avatar = `
     <div class='avatar'>
@@ -83,5 +156,5 @@ function createBlock(type, message=null) {
     if(type === 'in') block.insertAdjacentHTML("afterbegin", avatar);
     else if(type === 'out') block.insertAdjacentHTML("beforeend", avatar);
 
-    return block;
+    return [block, message_elem];
 }

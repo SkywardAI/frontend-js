@@ -4,7 +4,7 @@ import useHistory from "../../global/useHistory.js";
 let history = [], history_elem = null, last_selected_id;
 
 const { componetDismount:historyDismount, componentReMount: historyRemount } = useHistory(h=>{
-    history = h;
+    history = structuredClone(h);
     updateHistoryList();
 })
 

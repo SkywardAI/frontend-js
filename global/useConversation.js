@@ -4,6 +4,7 @@ import useHistory from "./useHistory.js";
 
 const defaultConversationSetting = {
     id: null,
+    stream_response: true,
     temperature: 0.2,
     top_k: 40,
     top_p: 0.9,
@@ -13,47 +14,32 @@ const defaultConversationSetting = {
 
 let currentConversation = {
     ...defaultConversationSetting,
-    id: 'not_selected'
+    history: []
 };
 
-
 const { onmount, remount, dismount, updateAll } = createHook();
-const { addHistory:addUserHistoryTicket } = useHistory(null);
+const { addHistory } = useHistory(null);
 
 export default function useConversation(updated) {
     const mount_key = onmount(updated);
 
-    function addHistory(histories) {
-        currentConversation.history.push(...histories);
+    async function startNewConversation() {
+        const { sessionUuid } = await (await request('chat/seesionuuid')).json();
+        currentConversation = {
+            ...defaultConversationSetting,
+            id: sessionUuid, history: []
+        };
+        addHistory({
+            id: currentConversation.id,
+            name: 'New Session',
+            createdAt: new Date().toUTCString()
+        })
         updateAll(currentConversation);
     }
 
-    function startNewConversation() {
-        currentConversation.id = null;
-        currentConversation.history = [];
+    async function sendMessage(messages) {
+        currentConversation.history.push(...messages);
         updateAll(currentConversation);
-    }
-
-    async function sendMessage(message) {
-        addHistory([{ type: 'out', message }]);
-
-        const { sessionUuid, message:botResponse } = 
-        await (await request('chat', {
-            method: 'POST',
-            body: {
-                sessionUuid: currentConversation.id || "uuid",
-                message
-            }
-        })).json()
-
-        if(currentConversation.id === null) {
-            addUserHistoryTicket({
-                id: sessionUuid, name: 'New Conversation', 
-                createdAt: new Date().toUTCString()
-            })
-            currentConversation.id = sessionUuid;
-        }
-        addHistory([{type: 'in', message: botResponse}])
     }
 
     async function selectConversation(id, settings = null) {
