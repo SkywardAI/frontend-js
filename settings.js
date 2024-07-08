@@ -1,4 +1,2 @@
 export const VERSION = '0.1.3'
-// export const API_ADDRESS = 'http://
-// kirin is the name of the API aggregator server container
-export const LOCAL_API_ADDRESS = '/api'
+export const API_ADDRESS = '/api'
