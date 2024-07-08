@@ -1,4 +1,4 @@
-import { LOCAL_API_ADDRESS } from "../settings.js";
+import { API_ADDRESS } from "../settings.js";
 import useSessionId from "../global/useSessionId.js";
 
 let session_id = '';
@@ -19,9 +19,12 @@ export default function request(url, options={}) {
         options.body = JSON.stringify(options.body)
     }
 
-    url = `${LOCAL_API_ADDRESS}/${url}`
-    return fetch(url, {
+    return fetch(reqAddress(url), {
         headers,
         ...options
     })
+}
+
+export function reqAddress(url) {
+    return `${API_ADDRESS}/${url}`
 }
