@@ -18,41 +18,27 @@ let currentConversation = {
 
 
 const { onmount, remount, dismount, updateAll } = createHook();
-const { addHistory:addUserHistoryTicket } = useHistory(null);
+const { addHistory } = useHistory(null);
 
 export default function useConversation(updated) {
     const mount_key = onmount(updated);
 
-    function addHistory(histories) {
-        currentConversation.history.push(...histories);
-        updateAll(currentConversation);
-    }
-
     function startNewConversation() {
-        currentConversation = structuredClone(defaultConversationSetting);
+        currentConversation = {...defaultConversationSetting};
         updateAll(currentConversation);
     }
 
-    async function sendMessage(message) {
-        addHistory([{ type: 'out', message }]);
-
-        const { sessionUuid, message:botResponse } = 
-        await (await request('chat', {
-            method: 'POST',
-            body: {
-                sessionUuid: currentConversation.id || "uuid",
-                message
-            }
-        })).json()
-
+    async function sendMessage(messages, uuid) {
         if(currentConversation.id === null) {
-            addUserHistoryTicket({
-                id: sessionUuid, name: 'New Conversation', 
+            currentConversation.id = uuid;
+            addHistory({
+                id: currentConversation.id,
+                name: 'New Conversation',
                 createdAt: new Date().toUTCString()
             })
-            currentConversation.id = sessionUuid;
         }
-        addHistory([{type: 'in', message: botResponse}])
+        currentConversation.history.push(...messages);
+        updateAll(currentConversation);
     }
 
     async function selectConversation(id, settings = null) {
