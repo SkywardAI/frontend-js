@@ -1,22 +1,18 @@
 import useConversation from "../../global/useConversation.js";
-import request from "../../tools/request.js";
+import request, { streamRequest } from "../../tools/request.js";
 
 let conversation = {}, main_elem;
 
 const { 
-    componentDismount, componentReMount, 
+    componetDismount, componentReMount, 
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
     if(c.id === conversation.id) return;
     conversation = {...c};
-    if(conversation.id === 'not_selected') return;
+    if(!conversation.id) return;
 
-    if(conversation.id === null) {
-        const conversation_main = document.getElementById('conversation-main');
-        if(conversation_main) conversation_main.innerHTML = "<div class='greeting'>Hi, how can I help you today?</div>"
-    }
-    buildForm();
     updateConversation();
+    buildForm();
 })
 
 export default function createChatMain(main) {
@@ -33,12 +29,12 @@ export default function createChatMain(main) {
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
 
-    if(componentReMount()) {
+    if(componentReMount() && conversation.id) {
         updateConversation();
         buildForm();
     }
 
-    return componentDismount;
+    return componetDismount;
 }
 
 function buildForm() {
@@ -55,14 +51,14 @@ function submitContent(evt) {
 
     const content = evt.target['send-content'].value;
     content && (
-        conversation.streamResponse ? 
+        conversation.stream_response ? 
         sendMessageStream(content) : 
         sendMessageWaiting(content)
     )
     evt.target['send-content'].value = ''
 }
 
-async function sendMessage(message, handleResponse) {
+async function sendMessage(message, send) {
     if(!conversation.history.length) {
         main_elem.innerHTML = ''
     }
@@ -70,12 +66,7 @@ async function sendMessage(message, handleResponse) {
     const [bot_answer, bot_answer_message] = createBlock('in');
     main_elem.appendChild(bot_answer);
 
-    const response = await request('chat', {
-        method: 'POST',
-        body: { sessionUuid: conversation.id || "uuid", message }
-    })
-
-    const content = await handleResponse(response, bot_answer_message);
+    const content = await send(bot_answer_message);
 
     appendConversationMessage([
         { type: 'out', message },
@@ -84,39 +75,42 @@ async function sendMessage(message, handleResponse) {
 }
 
 function sendMessageWaiting(msg) {
-    return sendMessage(msg, async (response, pending_elem) => {
-        const { sessionUuid, message } = await response.json();
-        if(conversation.id === null) { conversation.id = sessionUuid; }
+    return sendMessage(msg, async pending_elem => {
+        const response = await request('chat', {
+            method: 'POST',
+            body: { sessionUuid: conversation.id || "uuid", message }
+        })
+
+        const { message } = await response.json();
         pending_elem.textContent = message;
         return message;
     })
 }
 
-function sendMessageStream(msg) {
-    return sendMessage(msg, async (response, pending_elem) => {
-        const streamResponseReader = 
-        response.body.pipeThrough(new TextDecoderStream()).getReader();
-    
-        let content = '';
-    
-        while(true) {
-            const { value, done } = await streamResponseReader.read();
-            if(done) break;
-            const {sessionUuid, message} = JSON.parse(value);
-            if(sessionUuid && conversation.id === null) {
-                conversation.id = sessionUuid;
+async function sendMessageStream(msg) {
+    return sendMessage(msg, async pending_elem => {
+        let resp_content = ''
+        await streamRequest('chat', {
+            method: 'POST',
+            body: {
+                sessionUuid: conversation.id,
+                message: msg
             }
-            content += message;
-            pending_elem.textContent = content;
-        }
-        
-        return content;
+        }, res=>{
+            const { content } = JSON.parse(res.data);
+            resp_content += content;
+            pending_elem.textContent = resp_content;
+        })
+        return resp_content;
     })
-
 }
 
 function updateConversation() {
-    if(!conversation.history || !conversation.history.length) return;
+    if(!conversation.history) return;
+    if(!conversation.history.length && main_elem) {
+        main_elem.innerHTML = "<div class='greeting'>Hi, how can I help you today?</div>"
+        return;
+    }
 
     main_elem.innerHTML = ''
     conversation.history.forEach(({type, message})=>{

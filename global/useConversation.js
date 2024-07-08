@@ -4,6 +4,7 @@ import useHistory from "./useHistory.js";
 
 const defaultConversationSetting = {
     id: null,
+    stream_response: true,
     temperature: 0.2,
     top_k: 40,
     top_p: 0.9,
@@ -12,10 +13,8 @@ const defaultConversationSetting = {
 }
 
 let currentConversation = {
-    ...defaultConversationSetting,
-    id: 'not_selected'
+    ...defaultConversationSetting
 };
-
 
 const { onmount, remount, dismount, updateAll } = createHook();
 const { addHistory } = useHistory(null);
@@ -23,20 +22,21 @@ const { addHistory } = useHistory(null);
 export default function useConversation(updated) {
     const mount_key = onmount(updated);
 
-    function startNewConversation() {
-        currentConversation = {...defaultConversationSetting};
+    async function startNewConversation() {
+        const { sessionUuid } = await (await request('chat/seesionuuid')).json();
+        currentConversation = {
+            ...defaultConversationSetting,
+            id: sessionUuid
+        };
+        addHistory({
+            id: currentConversation.id,
+            name: 'New Session',
+            createdAt: new Date().toUTCString()
+        })
         updateAll(currentConversation);
     }
 
-    async function sendMessage(messages, uuid) {
-        if(currentConversation.id === null) {
-            currentConversation.id = uuid;
-            addHistory({
-                id: currentConversation.id,
-                name: 'New Conversation',
-                createdAt: new Date().toUTCString()
-            })
-        }
+    async function sendMessage(messages) {
         currentConversation.history.push(...messages);
         updateAll(currentConversation);
     }
