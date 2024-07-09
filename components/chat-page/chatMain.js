@@ -113,6 +113,7 @@ async function sendMessageStream(msg) {
                 }
             }
         }
+        return resp_content;
     })
 }
 
@@ -127,10 +128,6 @@ function updateConversation() {
     conversation.history.forEach(({type, message})=>{
         main_elem.appendChild(createBlock(type, message)[0])
     })
-
-    if(conversation.history.slice(-1)[0].type === 'out') {
-        main_elem.appendChild(createBlock('in')[0])
-    }
 }
 
 function createBlock(type, msg = '') {
@@ -142,23 +139,17 @@ function createBlock(type, msg = '') {
 
     block.appendChild(message);
 
-    let cursor = null;
-
-    if(type === 'out') {
-        message.textContent = msg;
-    } else {
-        cursor = document.createElement('span');
-        message.appendChild(cursor);
-    }
-
     if(type === 'in') {
         message.innerHTML = `
         <img class='dot-animation dot-1' src='/medias/circle-fill.svg'>
         <img class='dot-animation dot-2' src='/medias/circle-fill.svg'>
-        <img class='dot-animation dot-3' src='/medias/circle-fill.svg'>
-        `
+        <img class='dot-animation dot-3' src='/medias/circle-fill.svg'>`
 
         block.insertAdjacentHTML("afterbegin", `<img class='avatar' src='/medias/SkywardAI.png'>`)
+    }
+
+    if(msg) {
+        message.textContent = msg;
     }
 
     return [
