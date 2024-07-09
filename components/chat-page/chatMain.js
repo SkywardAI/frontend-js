@@ -63,16 +63,19 @@ async function sendMessage(message, send) {
         main_elem.innerHTML = ''
     }
     main_elem.appendChild(createBlock('out', message)[0]);
-    const [bot_answer, bot_answer_message] = createBlock('in');
+    main_elem.scrollTo({
+        top: main_elem.scrollHeight, 
+        behavior: 'smooth'
+    })
+    const [bot_answer, updateMessage] = createBlock('in');
     main_elem.appendChild(bot_answer);
-    bot_answer.focus();
 
     const response = await request('chat', {
         method: 'POST',
         body: { sessionUuid: conversation.id || "uuid", message }
     })
 
-    const content = await send(response, bot_answer_message);
+    const content = await send(response, updateMessage);
 
     appendConversationMessage([
         { type: 'out', message },
@@ -81,15 +84,15 @@ async function sendMessage(message, send) {
 }
 
 function sendMessageWaiting(msg) {
-    return sendMessage(msg, async (response, pending_elem) => {
+    return sendMessage(msg, async (response, updateMessage) => {
         const { message } = await response.json();
-        pending_elem.textContent = message;
+        updateMessage(message)
         return message;
     })
 }
 
 async function sendMessageStream(msg) {
-    return sendMessage(msg, async (response, pending_elem) => {
+    return sendMessage(msg, async (response, updateMessage) => {
         let resp_content = ''
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let pending_content = ''
@@ -102,7 +105,7 @@ async function sendMessageStream(msg) {
                 try {
                     const json = JSON.parse(splitted_content.shift().replace('data: ', ''))
                     resp_content += json.content;
-                    pending_elem.textContent = resp_content;
+                    updateMessage(resp_content);
                     pending_content = splitted_content.join('')
                     if(json.stop) break;
                 } catch(error) {
@@ -130,31 +133,44 @@ function updateConversation() {
     }
 }
 
-function createBlock(type, message=null) {
+function createBlock(type, msg = '') {
     const block = document.createElement('div');
     block.className = `conversation-block sender-${type}`;
 
-    const content = document.createElement('div')
-    content.className = 'content';
-    content.innerHTML = `
-    <div class='sender-name'>
-        From: ${type === 'in' ? 'AI' : 'You'}
-    </div>`
+    const message = document.createElement('div');
+    message.className = 'message';
 
-    const message_elem = document.createElement('div');
-    message_elem.className = 'message';
-    message_elem.innerHTML = message || "<img class='loading' src='/medias/arrow-clockwise.svg'>"
+    block.appendChild(message);
 
-    content.insertAdjacentElement("beforeend", message_elem);
-    block.appendChild(content);
+    let cursor = null;
 
-    const avatar = `
-    <div class='avatar'>
-        ${type === 'in' ? '<img src="/medias/robot.svg">' : '<img src="/medias/person.svg">'}
-    </div>`
+    if(type === 'out') {
+        message.textContent = msg;
+    } else {
+        cursor = document.createElement('span');
+        message.appendChild(cursor);
+    }
 
-    if(type === 'in') block.insertAdjacentHTML("afterbegin", avatar);
-    else if(type === 'out') block.insertAdjacentHTML("beforeend", avatar);
+    if(type === 'in') {
+        message.innerHTML = `
+        <img class='dot-animation dot-1' src='/medias/circle-fill.svg'>
+        <img class='dot-animation dot-2' src='/medias/circle-fill.svg'>
+        <img class='dot-animation dot-3' src='/medias/circle-fill.svg'>
+        `
 
-    return [block, message_elem];
+        block.insertAdjacentHTML("afterbegin", `<img class='avatar' src='/medias/SkywardAI.png'>`)
+    }
+
+    return [
+        block,
+        (msg) => {
+            if(msg) {
+                message.textContent = msg;
+                main_elem.scrollTo({
+                    top: main_elem.scrollHeight, 
+                    behavior: 'smooth'
+                })
+            }
+        }
+    ]
 }
