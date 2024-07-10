@@ -1,5 +1,6 @@
 * {
     --gray-bg: rgb(230, 230, 230);
+    --transparent-gray-bg: rgba(230, 230, 230, 0.6);
     font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
 
     /* scrollbar-width: thin; */
@@ -51,7 +52,7 @@ dialog {
     --side-bar-icon-size: calc(var(--side-bar-width) * 0.8);
     
     width: var(--side-bar-width);
-    border-right: 1px dashed gray;
+    border-right: 1px solid silver;
     position: fixed;
     left: 0;
     top: 0;
