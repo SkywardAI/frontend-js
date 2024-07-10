@@ -8,7 +8,7 @@ const fields = {
     temperature: { title: 'Temperature', valueRange: { min: 0, max: 2, is_100_times: true } },
     top_k: { title: 'Top-K', valueRange: { min: 0, max: 40 } },
     top_p: { title: 'Top-P', valueRange: { min: 0, max: 0.9, is_100_times: true } },
-    n_predict: { title: 'N-Predict', valueRange: { min: 0, max: 128 } }
+    n_predict: { title: 'N-Predict', valueRange: { min: 128, max: 512 } }
 }
 
 const { componetDismount, updateSetting, componentReMount } = useConversation(c=>{
