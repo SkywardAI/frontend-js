@@ -1,11 +1,13 @@
 import useConversation from "../../global/useConversation.js";
+import useModelSettings from "../../global/useModelSettings.js";
 import request from "../../tools/request.js";
 import getSVG from "../../tools/svgs.js";
 
-let conversation = {}, main_elem;
+let conversation = {}, model_settings = {}, main_elem, stream_response=true;
 
 const { 
-    componetDismount, componentReMount, 
+    componetDismount: conversationDismount, 
+    componentReMount: conversationReMount, 
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
     if(c.id === conversation.id) return;
@@ -14,6 +16,13 @@ const {
 
     updateConversation();
     buildForm();
+})
+
+const {
+    componetDismount: modelSettingsDismount,
+    componentReMount: modelSettingsRemount
+} = useModelSettings(s=>{
+    model_settings = s;
 })
 
 export default function createChatMain(main, toggleExpand) {
@@ -36,12 +45,16 @@ export default function createChatMain(main, toggleExpand) {
     main_elem = document.getElementById('conversation-main');
     document.getElementById('toggle-sidebar-expand').onclick = toggleExpand;
 
-    if(componentReMount() && conversation.id) {
+    modelSettingsRemount();
+    if(conversationReMount() && conversation.id) {
         updateConversation();
         buildForm();
     }
 
-    return componetDismount;
+    return ()=>{
+        conversationDismount();
+        modelSettingsDismount();
+    };
 }
 
 function buildForm() {
@@ -58,7 +71,7 @@ function submitContent(evt) {
 
     const content = evt.target['send-content'].value;
     content && (
-        conversation.stream_response ? 
+        stream_response ? 
         sendMessageStream(content) : 
         sendMessageWaiting(content)
     )
@@ -79,7 +92,10 @@ async function sendMessage(message, send) {
 
     const response = await request('chat', {
         method: 'POST',
-        body: { sessionUuid: conversation.id || "uuid", message }
+        body: { 
+            sessionUuid: conversation.id || "uuid", 
+            message, ...model_settings
+        }
     })
 
     const content = await send(response, updateMessage);
