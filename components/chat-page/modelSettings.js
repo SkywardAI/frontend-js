@@ -1,8 +1,12 @@
-import useConversation from "../../global/useConversation.js";
-import debounce from "../../tools/debounce.js";
+import useModelSettings from "../../global/useModelSettings.js";
 import settingSection from "./settingSection.js";
 
-let settings = {}, updated_settings = {}, init = false;
+let settings = {};
+
+const { 
+    componentReMount, componetDismount, 
+    updateSettings:updateModelSettings, setToDefault
+} = useModelSettings(s=>settings = s);
 
 const fields = {
     temperature: { title: 'Temperature', valueRange: { min: 0, max: 2, is_100_times: true } },
@@ -11,48 +15,41 @@ const fields = {
     n_predict: { title: 'N-Predict', valueRange: { min: 128, max: 512 } }
 }
 
-const { componetDismount, updateSetting, componentReMount } = useConversation(c=>{
-    settings = c;
-    loadSettings();
-})
-
-const updateModelSettings = debounce(async ()=>{
-    if(!await updateSetting(updated_settings)) {
-        loadSettings();
-        // TODO: show failed notification
-    } else {
-        // TODO: show success notification
-    }
-}, 500)
-
 export default function createModelSettings(main) {
     componentReMount();
 
+    const popup = document.createElement('dialog');
+    main.insertAdjacentElement("beforeend", popup)
+    popup.onclick = () => popup.close()
+
     const model_settings = document.createElement('div');
     model_settings.className = 'model-settings';
+    model_settings.onclick = event => event.stopPropagation();
 
-    model_settings.insertAdjacentHTML('afterbegin', "<div class='title'>Adjust Model Settings</div>")
+    model_settings.insertAdjacentHTML('afterbegin', `
+        <div class='title'>Adjust Model Settings</div>
+        <div class='sub-title'>Settings will be saved automatically</div>
+    `)
 
     for(const key in fields) {
         const { title, valueRange } = fields[key];
-        const [component, setter] = settingSection(title, valueRange, value=>{
-            updated_settings[key] = value;
-            updateModelSettings();
-        })
+        const [component, setter] = settingSection(
+            title, valueRange,
+            () => { setToDefault(key) && loadSettings() },
+            value=>updateModelSettings(key, value)
+        )
         model_settings.appendChild(component);
         fields[key].setValue = setter;
     }
 
-    main.appendChild(model_settings);
+    popup.appendChild(model_settings);
+    popup.showModal()
 
-    init = true;
     loadSettings();
     return componetDismount;
 }
 
 function loadSettings() {
-    if(!init) return;
-
     for(const key in fields) {
         fields[key].setValue(settings[key]);
     }
