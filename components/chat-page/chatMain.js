@@ -25,11 +25,20 @@ const {
     model_settings = s;
 })
 
-export default function createChatMain(main, toggleExpand) {
+export default function createChatMain(main, toggleExpand, openModelSetting) {
     main.insertAdjacentHTML('beforeend', `
     <div class='chat-outer-main'>
-        <div id='toggle-sidebar-expand' class='clickable'>
+        <div 
+            id='toggle-sidebar-expand' class='clickable function-icon'
+            title="Show/Hide Tickets History"
+        >
             ${getSVG('window-sidebar')}
+        </div>
+        <div 
+            id='toggle-setting-page' class='clickable function-icon'
+            title="Show Model Settings"
+        >
+            ${getSVG('gear')}
         </div>
         <div id='chat-main'>
             <div id='conversation-main'>
@@ -44,6 +53,7 @@ export default function createChatMain(main, toggleExpand) {
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
     document.getElementById('toggle-sidebar-expand').onclick = toggleExpand;
+    document.getElementById('toggle-setting-page').onclick = openModelSetting;
 
     modelSettingsRemount();
     if(conversationReMount() && conversation.id) {

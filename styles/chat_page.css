@@ -120,19 +120,21 @@
     width: var(--chat-main-width);
 }
 
-.chat-outer-main #toggle-sidebar-expand {
+.chat-outer-main .function-icon {
     --sidebar-expand-icon-size: 25px;
     --sidebar-expand-icon-margin: 20px;
 
     color: gray;
     width: var(--sidebar-expand-icon-size);
     height: var(--sidebar-expand-icon-size);
-    position: absolute;
+    position: relative;
     top: var(--sidebar-expand-icon-margin);
     left: var(--sidebar-expand-icon-margin);
+    margin-right: 10px;
+    display: inline-block;
 }
 
-.chat-outer-main #toggle-sidebar-expand svg {
+.chat-outer-main .function-icon svg {
     width: 100%;
     height: 100%;
 }

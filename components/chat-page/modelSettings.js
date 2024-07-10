@@ -15,12 +15,13 @@ const fields = {
     n_predict: { title: 'N-Predict', valueRange: { min: 128, max: 512 } }
 }
 
-export default function createModelSettings(main) {
+export default function createModelSettings(main, passDialogElem) {
     componentReMount();
 
     const popup = document.createElement('dialog');
+    popup.onclick = () => popup.close();
     main.insertAdjacentElement("beforeend", popup)
-    popup.onclick = () => popup.close()
+    passDialogElem(popup)
 
     const model_settings = document.createElement('div');
     model_settings.className = 'model-settings';
@@ -43,7 +44,6 @@ export default function createModelSettings(main) {
     }
 
     popup.appendChild(model_settings);
-    popup.showModal()
 
     loadSettings();
     return componetDismount;
