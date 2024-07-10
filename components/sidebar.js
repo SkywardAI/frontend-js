@@ -3,7 +3,6 @@ import getSVG from "../tools/svgs.js";
 
 const pages = [
     { name: 'chat', svgName: 'chat-dots-fill' },
-    { name: 'account', svgName: 'person-fill' },
     { name: 'model-hero', svgName: 'hero' },
     { name: 'training' },
     { name: 'info', svgName: 'info-circle-fill', not_page: true }

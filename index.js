@@ -14,9 +14,6 @@ function switchSelectedPage(page) {
     componetDismount = null;
 
     switch(page) {
-        case 'account':
-            componetDismount = createAccountPage();
-            break;
         case 'model-hero':
             componetDismount = createModelHeroPage();
             break;
@@ -36,6 +33,7 @@ function switchSelectedPage(page) {
 
 function build() {
     createSideBar(switchSelectedPage);
+    createAccountPage();
 }
 
 window.onload = build;

@@ -69,6 +69,25 @@ dialog {
     z-index: 1;
 }
 
+#user-avatar {
+    --user-avatar-size: 40px;
+    --user-avatar-margin: 30px;
+
+    position: fixed;
+    right: var(--user-avatar-margin);
+    top: 5px;
+
+    width: var(--user-avatar-size);
+    height: var(--user-avatar-size);
+    border-radius: var(--user-avatar-size);
+
+    background-color: var(--transparent-gray-bg);
+    color: gray;
+    border: 2px solid gray;
+    overflow: hidden;
+    z-index: 2;
+}
+
 
 @keyframes rotateLoading {
     from { transform: rotate(0); }
