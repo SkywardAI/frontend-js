@@ -59,6 +59,8 @@
     border-radius: 7px;
     text-align: center;
     border: 1px solid lightgray;
+    padding: 0px 10px;
+    overflow: hidden;
 }
 
 #chat-page #chat-history .tickets-list {
