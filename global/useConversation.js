@@ -4,6 +4,7 @@ import useHistory from "./useHistory.js";
 
 let currentConversation = {
     id: null,
+    pending: false,
     history: []
 };
 
@@ -26,7 +27,12 @@ export default function useConversation(updated) {
         updateAll(currentConversation);
     }
 
-    async function sendMessage(messages) {
+    function togglePending() {
+        currentConversation.pending = !currentConversation.pending;
+        updateAll(currentConversation);
+    }
+
+    function sendMessage(messages) {
         currentConversation.history.push(...messages);
         updateAll(currentConversation);
     }
@@ -44,7 +50,7 @@ export default function useConversation(updated) {
     updated && updated(currentConversation);
 
     return { 
-        selectConversation, startNewConversation, sendMessage,
+        selectConversation, startNewConversation, sendMessage, togglePending,
         componetDismount:dismount(mount_key), componentReMount:remount(mount_key) 
     }
 }
