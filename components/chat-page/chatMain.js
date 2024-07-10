@@ -1,5 +1,6 @@
 import useConversation from "../../global/useConversation.js";
 import request from "../../tools/request.js";
+import getSVG from "../../tools/svgs.js";
 
 let conversation = {}, main_elem;
 
@@ -15,19 +16,25 @@ const {
     buildForm();
 })
 
-export default function createChatMain(main) {
+export default function createChatMain(main, toggleExpand) {
     main.insertAdjacentHTML('beforeend', `
-    <div id='chat-main'>
-        <div id='conversation-main'>
-            <div class='greeting'>
-                Please select a ticket or start a new conversation on left.
-            </div>
+    <div class='chat-outer-main'>
+        <div id='toggle-sidebar-expand' class='clickable'>
+            ${getSVG('window-sidebar')}
         </div>
-        <form id='submit-chat' autocomplete="off"></form>
+        <div id='chat-main'>
+            <div id='conversation-main'>
+                <div class='greeting'>
+                    Please select a ticket or start a new conversation on left.
+                </div>
+            </div>
+            <form id='submit-chat' autocomplete="off"></form>
+        </div>
     </div>`)
 
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
+    document.getElementById('toggle-sidebar-expand').onclick = toggleExpand;
 
     if(componentReMount() && conversation.id) {
         updateConversation();
@@ -42,7 +49,7 @@ function buildForm() {
     <input type='text' name='send-content' placeholder='Ask anything here!'>
     <div class='send'>
         <input type='submit' class='submit-btn clickable'>
-        <img class='submit-icon' src='/medias/send.svg'>
+        ${getSVG('send', 'submit-icon')}
     </div>`;
 }
 
@@ -141,9 +148,9 @@ function createBlock(type, msg = '') {
 
     if(type === 'in') {
         message.innerHTML = `
-        <img class='dot-animation dot-1' src='/medias/circle-fill.svg'>
-        <img class='dot-animation dot-2' src='/medias/circle-fill.svg'>
-        <img class='dot-animation dot-3' src='/medias/circle-fill.svg'>`
+        ${getSVG('circle-fill', 'dot-animation dot-1')}
+        ${getSVG('circle-fill', 'dot-animation dot-2')}
+        ${getSVG('circle-fill', 'dot-animation dot-3')}`
 
         block.insertAdjacentHTML("afterbegin", `<img class='avatar' src='/medias/SkywardAI.png'>`)
     }
