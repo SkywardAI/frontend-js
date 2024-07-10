@@ -1,5 +1,6 @@
 * {
     --gray-bg: rgb(230, 230, 230);
+    --transparent-gray-bg: rgba(230, 230, 230, 0.6);
     font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
 
     /* scrollbar-width: thin; */
@@ -27,6 +28,22 @@ div {
     box-sizing: border-box;
 }
 
+svg {
+    display: block;
+}
+
+dialog {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+}
+
 .clickable:hover {
     cursor: pointer;
 }
@@ -35,7 +52,7 @@ div {
     --side-bar-icon-size: calc(var(--side-bar-width) * 0.8);
     
     width: var(--side-bar-width);
-    border-right: 1px dashed gray;
+    border-right: 1px solid silver;
     position: fixed;
     left: 0;
     top: 0;
@@ -50,6 +67,25 @@ div {
     right: 0;
     top: 0;
     z-index: 1;
+}
+
+#user-avatar {
+    --user-avatar-size: 40px;
+    --user-avatar-margin: 30px;
+
+    position: fixed;
+    right: var(--user-avatar-margin);
+    top: 5px;
+
+    width: var(--user-avatar-size);
+    height: var(--user-avatar-size);
+    border-radius: var(--user-avatar-size);
+
+    background-color: var(--transparent-gray-bg);
+    color: gray;
+    border: 2px solid gray;
+    overflow: hidden;
+    z-index: 2;
 }
 
 

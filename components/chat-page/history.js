@@ -59,8 +59,7 @@ function updateHistoryList() {
         ticket.id = `history-ticket-${id}`
         ticket.innerHTML = 
         `<div class='title'>${name}</div>
-        <div class='datetime'>${createdAt}</div>
-        <div class='preview'>this is a preview</div>`
+        <div class='datetime'>${createdAt}</div>`
 
         ticket.onclick = () => {
             selectConversation(id);

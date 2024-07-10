@@ -1,8 +1,8 @@
 import createInfoPage from "./info-page.js";
+import getSVG from "../tools/svgs.js";
 
 const pages = [
     { name: 'chat', svgName: 'chat-dots-fill' },
-    { name: 'account', svgName: 'person-fill' },
     { name: 'model-hero', svgName: 'hero' },
     { name: 'training' },
     { name: 'info', svgName: 'info-circle-fill', not_page: true }
@@ -15,7 +15,7 @@ export default function createSideBar(switchSelectedPage) {
     ${pages.map(({name, svgName})=>{
         return `
         <div id='sidebar-icon-${name}' class='sidebar-icon clickable'>
-            <img src='/medias/${svgName || name}.svg'>
+            ${getSVG(svgName || name)}
         </div>
         `
     }).join('')}`

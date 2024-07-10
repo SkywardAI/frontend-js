@@ -1,4 +1,6 @@
-export default function settingSection(title, valueRange, updateSetting) {
+import getSVG from "../../tools/svgs.js";
+
+export default function settingSection(title, valueRange, setToDefault, updateSetting) {
 
     const { max, min, from_range, to_range } = rangeValueConverter(valueRange)
 
@@ -20,8 +22,14 @@ export default function settingSection(title, valueRange, updateSetting) {
     const text = document.createElement('input');
     text.type = 'text';
 
+    const restore_default_btn = document.createElement('div');
+    restore_default_btn.className = 'restore-default-icon clickable';
+    restore_default_btn.innerHTML = getSVG('arrow-counterclockwise');
+    restore_default_btn.onclick = setToDefault;
+
     container.appendChild(range);
     container.appendChild(text);
+    container.appendChild(restore_default_btn);
 
     setting_section.appendChild(title_elem);
     setting_section.appendChild(container);
@@ -34,13 +42,17 @@ export default function settingSection(title, valueRange, updateSetting) {
 
     text.onchange = function() {
         const value = +text.value;
-        if(isNaN(value) || value < valueRange.min || value > valueRange.max) {
-            text.value = from_range(+range.value)
+        if(isNaN(value)) {
+            text.value = from_range(+range.value);
             return;
+        } else if(value < valueRange.min) {
+            text.value = valueRange.min;
+        } else if(value > valueRange.max) {
+            text.value = valueRange.max;
         }
 
-        range.value = to_range(value);
-        updateSetting(value);
+        range.value = to_range(+text.value);
+        updateSetting(+text.value);
     }
 
     function setter(value) {

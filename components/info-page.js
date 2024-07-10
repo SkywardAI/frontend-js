@@ -1,13 +1,14 @@
 import { VERSION } from '../settings.js'
 import capitalizeFirstLetter from '../tools/capitalizeFirstLetter.js';
 import request from '../tools/request.js';
+import getSVG from '../tools/svgs.js';
 
 export default function createInfoPage() {
     const icon = document.getElementById('sidebar-icon-info');
     
     icon.insertAdjacentHTML("beforeend", `
     <div id='all-versions'>
-        <img class='loading' src='/medias/arrow-clockwise.svg'>
+        ${getSVG('arrow-clockwise', 'loading')}
     </div>`)
 
     updateVersions();

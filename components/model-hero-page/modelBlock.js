@@ -1,4 +1,5 @@
 import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
+import getSVG from "../../tools/svgs.js";
 
 export default function createModelBlock(title, in_playground = false, removeModel = null, has_params = false) {
     const block = document.createElement('div');
@@ -11,7 +12,7 @@ export default function createModelBlock(title, in_playground = false, removeMod
 
     const remove_btn = document.createElement('div');
     remove_btn.className = 'remove-model clickable'
-    remove_btn.innerHTML = '<img src=/medias/x-lg.svg>'
+    remove_btn.innerHTML = getSVG('x-lg')
     remove_btn.onclick = removeModel;
     block.appendChild(remove_btn);
 

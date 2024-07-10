@@ -1,8 +1,6 @@
 #chat-page {
-
-    --history-width: 23%;
-    --main-width: 50%;
-    --settings-width: 27%;
+    --history-width: 20%;
+    --chat-main-width: calc(100% - var(--history-width));
 
     width: 100%;
     height: 100%;
@@ -24,12 +22,19 @@
     --new-conversation-height: 50px;
 
     width: var(--history-width);
-    border-right: 1px dashed gray;
+    border-right: 1px solid silver;
     height: 100%;
     position: absolute;
     left: 0;
     top: 0;
     overflow: auto;
+    transform: scaleX(0);
+    transition-duration: .5s;
+    transform-origin: left center;
+}
+
+#chat-page.sidebar-expanded #chat-history {
+    transform: scaleX(1);
 }
 
 #chat-page #chat-history .new-conversation {
@@ -40,7 +45,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    border-bottom: 1px dashed lightgray;
+    border-bottom: 1px solid silver;
 }
 
 #chat-page #chat-history .new-conversation .title {
@@ -54,6 +59,8 @@
     border-radius: 7px;
     text-align: center;
     border: 1px solid lightgray;
+    padding: 0px 10px;
+    overflow: hidden;
 }
 
 #chat-page #chat-history .tickets-list {
@@ -68,21 +75,22 @@
 
 #chat-page #chat-history .tickets-list .ticket {
     width: 100%;
-    min-height: 90px;
-    border-radius: 10px;
-    padding: 10px;
+    border-radius: 5px;
+    padding: 15px 10px;
     transition-duration: .5s;
 }
 
 #chat-page #chat-history .tickets-list .ticket.selected,
-#chat-page #chat-history .new-conversation .title:hover,
-#chat-page #chat-history .tickets-list .ticket:hover {
+#chat-page #chat-history .new-conversation .title:hover {
     background-color: var(--gray-bg);
 }
 
+#chat-page #chat-history .tickets-list .ticket:hover {
+    background-color: var(--transparent-gray-bg);
+}
+
 #chat-page #chat-history .tickets-list .ticket .title {
-    font-weight: 800;
-    font-size: 22px;
+    font-size: 19px;
 }
 
 #chat-page #chat-history .tickets-list .ticket .datetime {
@@ -102,28 +110,69 @@
 
 =====================================================
 */
-#chat-page #chat-main {
+.chat-outer-main {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transition-duration: .5s;
+    transform-origin: left center;
+}
+#chat-page.sidebar-expanded .chat-outer-main {
+    width: var(--chat-main-width);
+}
+
+.chat-outer-main .function-icon {
+    --sidebar-expand-icon-size: 25px;
+    --sidebar-expand-icon-margin: 20px;
+
+    color: gray;
+    width: var(--sidebar-expand-icon-size);
+    height: var(--sidebar-expand-icon-size);
+    position: relative;
+    top: var(--sidebar-expand-icon-margin);
+    left: var(--sidebar-expand-icon-margin);
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.chat-outer-main .function-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+#chat-main {
     --send-section-size: 50px;
     --leave-bottom: 15px;
+
+    --main-width: 60%;
+    --top-bottom-padding: 20px;
+    --conversation-main-side-padding: 30px;
 
     width: var(--main-width);
     height: 100%;
     position: absolute;
     top: 0;
-    left: var(--history-width);
-    border-right: 1px dashed gray;
+    left: calc((100% - var(--main-width)) / 2);
+    padding-top: var(--top-bottom-padding);
+    transition-duration: .5s
 }
 
-#chat-page #chat-main #conversation-main {
+#chat-page.sidebar-expanded #chat-main {
+    --main-width: 75%;
+}
+
+#conversation-main {
     position: absolute;
     width: 100%;
-    height: calc(100% - var(--send-section-size) - var(--leave-bottom) - 10px);
+    height: calc(100% - var(--send-section-size) - var(--leave-bottom) - (var(--top-bottom-padding) * 2));
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px;
+    padding: 0px var(--conversation-main-side-padding);
 }
 
-#chat-page #chat-main #conversation-main .greeting {
+#conversation-main .greeting {
     width: fit-content;
     height: fit-content;
     margin: auto;
@@ -134,87 +183,76 @@
     max-width: 80%;
 }
 
-#chat-page #chat-main #conversation-main .conversation-block {
-    --avatar-size: 50px;
-    --avatar-margin: 10px;
-
-    width: 100%;
-    display: flex;
+#conversation-main .conversation-block {
+    margin-bottom: 30px;
     position: relative;
-    margin-bottom: 10px;
 }
 
-#chat-page #chat-main #conversation-main .conversation-block .avatar {
+#conversation-main .conversation-block.sender-in {
+    display: flex;
+}
+
+#conversation-main .conversation-block.sender-in .avatar {
+    --avatar-size: 35px;
     width: var(--avatar-size);
     height: var(--avatar-size);
     border-radius: var(--avatar-size);
-    background-color: var(--gray-bg);
-    margin-right: var(--avatar-margin);
-    overflow: hidden;
-    position: relative;
+    border: 1px solid lightgray;
+    margin-right: 14px;
 }
 
-#chat-page #chat-main #conversation-main .conversation-block.sender-out .avatar {
-    margin-right: unset;
-    margin-left: var(--avatar-margin);
+#conversation-main .conversation-block .message {
+    font-size: 18px;
 }
 
-#chat-page #chat-main #conversation-main .conversation-block .avatar img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-#chat-page #chat-main #conversation-main .conversation-block .content {
-    width: calc(100% - var(--avatar-margin) - var(--avatar-size));
-    height: fit-content;
-}
-
-#chat-page #chat-main #conversation-main .conversation-block .content .sender-name {
-    color: gray;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-#chat-page #chat-main #conversation-main .conversation-block .content .message {
-    background-color: rgb(240, 240, 240);
-    border-radius: 10px;
+#conversation-main .conversation-block.sender-out .message {
     width: fit-content;
-    max-width: 100%;
-    word-wrap: break-word;
-    height: fit-content;
-    padding: 20px;
+    padding: 13px 30px;
+    border-radius: 13px;
+    background-color: var(--transparent-gray-bg);
     position: relative;
-}
-
-#chat-page #chat-main #conversation-main 
-.conversation-block.sender-out .content {
-    text-align: right;
-}
-
-#chat-page #chat-main #conversation-main 
-.conversation-block.sender-out .content .message {
     margin-right: 0;
     margin-left: auto;
 }
 
-#chat-page #chat-main #conversation-main .conversation-block .content .message .loading {
-    animation: rotateLoading 1s infinite linear;
-    width: 20px;
-    height: 20px;
+#conversation-main .conversation-block.sender-in .message {
+    line-height: 27px;
+}
+
+#conversation-main .conversation-block.sender-in .model-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+@keyframes dot-animation {
+    0% { transform: translateY(0px); }
+    25% { transform: translateY(-5px); }
+    50% { transform: translateY(0px); }
+    75% { transform: translateY(5px); }
+    100% { transform: translateY(0px); }
+}
+
+#conversation-main .conversation-block.sender-in .message .dot-animation {
+    animation: dot-animation 1.2s linear infinite;
+    width: 10px;
+    margin: 5px;
+    display: inline-block;
+}
+
+#conversation-main .conversation-block.sender-in .message .dot-animation.dot-2 {
+    animation-delay: .3s;
+}
+
+#conversation-main .conversation-block.sender-in .message .dot-animation.dot-3 {
+    animation-delay: .6s;
 }
 
 #chat-page #chat-main #submit-chat {
-
-    --chat-input-width: 95%;
-
     position: absolute;
-    width: var(--chat-input-width);
+    width: calc(100% - var(--conversation-main-side-padding));
     height: var(--send-section-size);
     bottom: var(--leave-bottom);
-    left: calc((100% - var(--chat-input-width)) / 2);
+    left: var(--conversation-main-side-padding);
     overflow: hidden;
 }
 
@@ -265,18 +303,32 @@
 */
 
 .model-settings {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: var(--settings-width);
-    height: 100%;
+    --model-setting-width: 400px;
+    --model-setting-height: 500px;
+
+    position: relative;
+    margin: auto;
+    width: var(--model-setting-width);
+    height: var(--model-setting-height);
+    top: calc((100vh - var(--model-setting-height)) / 3);
     overflow-y: auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .model-settings .title {
     margin: 10px 20px;
     font-size: 25px;
     font-weight: bolder;
+    text-align: center;
+}
+
+.model-settings .sub-title {
+    text-align: center;
+    font-size: 13px;
+    color: gray;
+    margin-bottom: 7px;
 }
 
 .model-settings .setting-section {
@@ -286,9 +338,10 @@
 
 .model-settings .setting-section .title {
     margin: unset;
-    margin-bottom: 7px;
+    margin-bottom: 3px;
     font-size: 17px;
     font-weight: unset;
+    text-align: left;
 }
 
 .model-settings .setting-section input[type="text"] {
@@ -305,7 +358,7 @@
 }
 
 .model-settings .setting-section .combined-section {
-    --item-margin: 5px;
+    --item-margin: 10px;
     display: flex;
     align-items: center;
 }
@@ -313,13 +366,25 @@
 .model-settings .setting-section .combined-section *:last-child { margin-right: unset; }
 
 .model-settings .setting-section .combined-section.range {
-    width: 60%;
+    width: 100%;
+    --restore-default-icon-size: 20px;
+    --range-input-width: calc(75% - var(--restore-default-icon-size));
+    --text-input-width: 25%;
 }
 
 .model-settings .setting-section .combined-section.range input[type="range"] {
-    width: 75%;
+    width: var(--range-input-width);
 }
 .model-settings .setting-section .combined-section.range input[type="text"] {
-    width: 25%;
+    width: var(--text-input-width);
     text-align: center;
+}
+.model-settings .setting-section .combined-section.range .restore-default-icon {
+    width: var(--restore-default-icon-size);
+    height: var(--restore-default-icon-size);
+    color: dodgerblue;
+}
+.model-settings .setting-section .combined-section.range .restore-default-icon svg {
+    width: 100%;
+    height: 100%;
 }

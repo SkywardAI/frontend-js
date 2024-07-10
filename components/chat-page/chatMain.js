@@ -1,10 +1,13 @@
 import useConversation from "../../global/useConversation.js";
+import useModelSettings from "../../global/useModelSettings.js";
 import request from "../../tools/request.js";
+import getSVG from "../../tools/svgs.js";
 
-let conversation = {}, main_elem;
+let conversation = {}, model_settings = {}, main_elem, stream_response=true;
 
 const { 
-    componetDismount, componentReMount, 
+    componetDismount: conversationDismount, 
+    componentReMount: conversationReMount, 
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
     if(c.id === conversation.id) return;
@@ -15,26 +18,53 @@ const {
     buildForm();
 })
 
-export default function createChatMain(main) {
+const {
+    componetDismount: modelSettingsDismount,
+    componentReMount: modelSettingsRemount
+} = useModelSettings(s=>{
+    model_settings = s;
+})
+
+export default function createChatMain(main, toggleExpand, openModelSetting) {
     main.insertAdjacentHTML('beforeend', `
-    <div id='chat-main'>
-        <div id='conversation-main'>
-            <div class='greeting'>
-                Please select a ticket or start a new conversation on left.
-            </div>
+    <div class='chat-outer-main'>
+        <div 
+            id='toggle-sidebar-expand' class='clickable function-icon'
+            title="Show/Hide Tickets History"
+        >
+            ${getSVG('window-sidebar')}
         </div>
-        <form id='submit-chat' autocomplete="off"></form>
+        <div 
+            id='toggle-setting-page' class='clickable function-icon'
+            title="Show Model Settings"
+        >
+            ${getSVG('gear')}
+        </div>
+        <div id='chat-main'>
+            <div id='conversation-main'>
+                <div class='greeting'>
+                    Please select a ticket or start a new conversation on left.
+                </div>
+            </div>
+            <form id='submit-chat' autocomplete="off"></form>
+        </div>
     </div>`)
 
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
+    document.getElementById('toggle-sidebar-expand').onclick = toggleExpand;
+    document.getElementById('toggle-setting-page').onclick = openModelSetting;
 
-    if(componentReMount() && conversation.id) {
+    modelSettingsRemount();
+    if(conversationReMount() && conversation.id) {
         updateConversation();
         buildForm();
     }
 
-    return componetDismount;
+    return ()=>{
+        conversationDismount();
+        modelSettingsDismount();
+    };
 }
 
 function buildForm() {
@@ -42,7 +72,7 @@ function buildForm() {
     <input type='text' name='send-content' placeholder='Ask anything here!'>
     <div class='send'>
         <input type='submit' class='submit-btn clickable'>
-        <img class='submit-icon' src='/medias/send.svg'>
+        ${getSVG('send', 'submit-icon')}
     </div>`;
 }
 
@@ -51,7 +81,7 @@ function submitContent(evt) {
 
     const content = evt.target['send-content'].value;
     content && (
-        conversation.stream_response ? 
+        stream_response ? 
         sendMessageStream(content) : 
         sendMessageWaiting(content)
     )
@@ -63,16 +93,22 @@ async function sendMessage(message, send) {
         main_elem.innerHTML = ''
     }
     main_elem.appendChild(createBlock('out', message)[0]);
-    const [bot_answer, bot_answer_message] = createBlock('in');
+    main_elem.scrollTo({
+        top: main_elem.scrollHeight, 
+        behavior: 'smooth'
+    })
+    const [bot_answer, updateMessage] = createBlock('in');
     main_elem.appendChild(bot_answer);
-    bot_answer.focus();
 
     const response = await request('chat', {
         method: 'POST',
-        body: { sessionUuid: conversation.id || "uuid", message }
+        body: { 
+            sessionUuid: conversation.id || "uuid", 
+            message, ...model_settings
+        }
     })
 
-    const content = await send(response, bot_answer_message);
+    const content = await send(response, updateMessage);
 
     appendConversationMessage([
         { type: 'out', message },
@@ -81,15 +117,15 @@ async function sendMessage(message, send) {
 }
 
 function sendMessageWaiting(msg) {
-    return sendMessage(msg, async (response, pending_elem) => {
+    return sendMessage(msg, async (response, updateMessage) => {
         const { message } = await response.json();
-        pending_elem.textContent = message;
+        updateMessage(message)
         return message;
     })
 }
 
 async function sendMessageStream(msg) {
-    return sendMessage(msg, async (response, pending_elem) => {
+    return sendMessage(msg, async (response, updateMessage) => {
         let resp_content = ''
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
         let pending_content = ''
@@ -102,7 +138,7 @@ async function sendMessageStream(msg) {
                 try {
                     const json = JSON.parse(splitted_content.shift().replace('data: ', ''))
                     resp_content += json.content;
-                    pending_elem.textContent = resp_content;
+                    updateMessage(resp_content);
                     pending_content = splitted_content.join('')
                     if(json.stop) break;
                 } catch(error) {
@@ -110,6 +146,7 @@ async function sendMessageStream(msg) {
                 }
             }
         }
+        return resp_content;
     })
 }
 
@@ -124,37 +161,40 @@ function updateConversation() {
     conversation.history.forEach(({type, message})=>{
         main_elem.appendChild(createBlock(type, message)[0])
     })
-
-    if(conversation.history.slice(-1)[0].type === 'out') {
-        main_elem.appendChild(createBlock('in')[0])
-    }
 }
 
-function createBlock(type, message=null) {
+function createBlock(type, msg = '') {
     const block = document.createElement('div');
     block.className = `conversation-block sender-${type}`;
 
-    const content = document.createElement('div')
-    content.className = 'content';
-    content.innerHTML = `
-    <div class='sender-name'>
-        From: ${type === 'in' ? 'AI' : 'You'}
-    </div>`
+    const message = document.createElement('div');
+    message.className = 'message';
 
-    const message_elem = document.createElement('div');
-    message_elem.className = 'message';
-    message_elem.innerHTML = message || "<img class='loading' src='/medias/arrow-clockwise.svg'>"
+    block.appendChild(message);
 
-    content.insertAdjacentElement("beforeend", message_elem);
-    block.appendChild(content);
+    if(type === 'in') {
+        message.innerHTML = `
+        ${getSVG('circle-fill', 'dot-animation dot-1')}
+        ${getSVG('circle-fill', 'dot-animation dot-2')}
+        ${getSVG('circle-fill', 'dot-animation dot-3')}`
 
-    const avatar = `
-    <div class='avatar'>
-        ${type === 'in' ? '<img src="/medias/robot.svg">' : '<img src="/medias/person.svg">'}
-    </div>`
+        block.insertAdjacentHTML("afterbegin", `<img class='avatar' src='/medias/SkywardAI.png'>`)
+    }
 
-    if(type === 'in') block.insertAdjacentHTML("afterbegin", avatar);
-    else if(type === 'out') block.insertAdjacentHTML("beforeend", avatar);
+    if(msg) {
+        message.textContent = msg;
+    }
 
-    return [block, message_elem];
+    return [
+        block,
+        (msg) => {
+            if(msg) {
+                message.textContent = msg;
+                main_elem.scrollTo({
+                    top: main_elem.scrollHeight, 
+                    behavior: 'smooth'
+                })
+            }
+        }
+    ]
 }
