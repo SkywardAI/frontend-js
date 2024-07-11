@@ -1,7 +1,95 @@
-#user-avatar svg {
-    width: 110%;
-    height: 110%;
-    left: -5%;
-    bottom: -5%;
+.account-main {
+    --img-width: 60%;
+    --details-width: calc(100% - var(--img-width));
+
+    width: 70vw;
+    height: 80vh;
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    left: 15vw;
+    top: 10vh;
+    background-color: white;
+    border-radius: 15px;
+}
+
+.account-main .logo-image {
+    position: absolute;
+    width: var(--img-width);
+    height: 100%;
+    left: 0;
+    top: 0;
+    align-items: center;
+    display: flex;
+}
+
+.account-main .logo-image img {
+    margin: auto;
+}
+
+.account-main .input-details-main {
+    --item-width: 230px;
+    --item-height: 40px;
+
+    position: absolute;
+    width: var(--details-width);
+    height: 100%;
+    top: 0;
+    right: 0;
+    padding: 30px;
+    align-content: center;
+}
+
+.input-details-main .account-field-container {
+    width: fit-content;
+    height: fit-content;
     position: relative;
+    margin-bottom: 10px;
+}
+
+.input-details-main .account-field-container .title {
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-details-main .account-field-container input {
+    width: var(--item-width);
+    height: var(--item-height);
+    border: 1px solid gray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 0px 15px;
+    font-size: 16px;
+}
+.input-details-main .account-field-container input:focus {
+    outline: none;
+}
+
+.input-details-main hr {
+    width: var(--item-width);
+    position: relative;
+    margin: auto;
+    margin-left: 0;
+    margin-top: 20px;
+}
+
+.input-details-main .submit-button {
+    width: var(--item-width);
+    height: calc(var(--item-height) + 5px);
+    border-radius: 16px;
+    background-color: dodgerblue;
+    color: white;
+    box-sizing: border-box;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    display: block;
+}
+
+.input-details-main .submit-button.reverse-color {
+    background-color: white;
+    border: 1px solid dodgerblue;
+    color: dodgerblue;
 }

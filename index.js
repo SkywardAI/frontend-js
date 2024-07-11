@@ -1,6 +1,5 @@
 import createSideBar from "./components/sidebar.js";
 import createChatPage from "./components/chat-page/index.js";
-import createAccountPage from "./components/account-page/index.js";
 import createTrainingPage from "./components/training-page/index.js";
 import createModelHeroPage from "./components/model-hero-page/index.js";
 
@@ -33,7 +32,6 @@ function switchSelectedPage(page) {
 
 function build() {
     createSideBar(switchSelectedPage);
-    createAccountPage();
 }
 
 window.onload = build;
