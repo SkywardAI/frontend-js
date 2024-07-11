@@ -201,6 +201,10 @@ function updateConversation() {
     conversation.history.forEach(({type, message})=>{
         main_elem.appendChild(createBlock(type, message)[0])
     })
+    main_elem.scrollTo({
+        top: main_elem.scrollHeight, 
+        behavior: 'smooth'
+    })
 }
 
 function createBlock(type, msg = '') {
