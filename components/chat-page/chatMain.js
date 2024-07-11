@@ -131,12 +131,12 @@ async function sendMessage(message, send) {
         main_elem.innerHTML = ''
         updateHistoryName(conversation.id, message.substring(0, 20))
     }
-    main_elem.appendChild(createBlock('out', message)[0]);
+    main_elem.appendChild(createBlock('user', message)[0]);
     main_elem.scrollTo({
         top: main_elem.scrollHeight, 
         behavior: 'smooth'
     })
-    const [bot_answer, updateMessage] = createBlock('in');
+    const [bot_answer, updateMessage] = createBlock('assistant');
     main_elem.appendChild(bot_answer);
 
     const response = await request('chat', {
@@ -151,8 +151,8 @@ async function sendMessage(message, send) {
     togglePending();
 
     appendConversationMessage([
-        { type: 'out', message },
-        { type: 'in', message: content}
+        { type: 'user', message },
+        { type: 'assistant', message: content}
     ], conversation.id)
 }
 
@@ -216,7 +216,7 @@ function createBlock(type, msg = '') {
 
     block.appendChild(message);
 
-    if(type === 'in') {
+    if(type === 'assistant') {
         message.innerHTML = `
         ${getSVG('circle-fill', 'dot-animation dot-1')}
         ${getSVG('circle-fill', 'dot-animation dot-2')}
