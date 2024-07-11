@@ -19,7 +19,7 @@ useSessionId(id=>{
  * @param {Function} updated callback function when history updated
  * @returns {Object} List of history operators
  */
-export default function useHistory(updated) {
+export default function useHistory(updated = null) {
     const mount_key = onmount(updated)
 
     async function requestUpdateHistory() {
@@ -44,6 +44,20 @@ export default function useHistory(updated) {
         init = false;
     }
 
+    function updateHistoryName(id, name) {
+        for(const index in history) {
+            if(history[index].id === id) {
+                history[index].name = name;
+                // TODO: tell backend
+            }
+        }
+        updateAll(history);
+    }
+
+    function getHistory(id) {
+        return history.filter(e=>e.id === id).pop();
+    }
+
     if(!init) {
         init = true;
         requestUpdateHistory();
@@ -53,7 +67,7 @@ export default function useHistory(updated) {
     updated && updated(history);
 
     return { 
-        requestUpdateHistory, addHistory, clearHistory, 
+        requestUpdateHistory, addHistory, clearHistory, getHistory, updateHistoryName,
         componetDismount: dismount(mount_key), componentReMount:remount(mount_key) 
     }
 }

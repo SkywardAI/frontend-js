@@ -1,15 +1,23 @@
 import useConversation from "../../global/useConversation.js";
+import useHistory from "../../global/useHistory.js";
 import useModelSettings from "../../global/useModelSettings.js";
+import { formatJSON } from "../../tools/conversationFormat.js";
 import request from "../../tools/request.js";
 import getSVG from "../../tools/svgs.js";
 
-let conversation = {}, model_settings = {}, main_elem, stream_response=true;
+let conversation = {}, model_settings = {}, 
+    main_elem, toggle_expand,
+    stream_response=true;
 
 const { 
     componetDismount: conversationDismount, 
     componentReMount: conversationReMount, 
+    togglePending,
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
+    conversation.pending = c.pending;
+    const submit_icon = document.querySelector('#submit-chat .send svg.submit-icon');
+    submit_icon && submit_icon.classList.toggle('pending', conversation.pending)
     if(c.id === conversation.id) return;
     conversation = c;
     if(!conversation.id) return;
@@ -24,6 +32,8 @@ const {
 } = useModelSettings(s=>{
     model_settings = s;
 })
+
+const { getHistory, updateHistoryName } = useHistory();
 
 export default function createChatMain(main, toggleExpand, openModelSetting) {
     main.insertAdjacentHTML('beforeend', `
@@ -40,6 +50,12 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
         >
             ${getSVG('gear')}
         </div>
+        <div 
+            id='download-conversation' class='clickable function-icon'
+            title="Export Current Conversation as JSON"
+        >
+            ${getSVG('box-arrow-up')}
+        </div>
         <div id='chat-main'>
             <div id='conversation-main'>
                 <div class='greeting'>
@@ -50,10 +66,17 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
         </div>
     </div>`)
 
+    if(!toggle_expand) toggle_expand = toggleExpand;
+
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
-    document.getElementById('toggle-sidebar-expand').onclick = toggleExpand;
+    document.getElementById('toggle-sidebar-expand').onclick = toggle_expand;
     document.getElementById('toggle-setting-page').onclick = openModelSetting;
+    document.getElementById('download-conversation').onclick = () => {
+        if(conversation.id && conversation.history.length) {
+            formatJSON(conversation, getHistory(conversation.id))
+        }
+    }
 
     modelSettingsRemount();
     if(conversationReMount() && conversation.id) {
@@ -68,16 +91,30 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
 }
 
 function buildForm() {
-    document.getElementById('submit-chat').innerHTML = `
-    <input type='text' name='send-content' placeholder='Ask anything here!'>
+    const submit_chat =  document.getElementById('submit-chat')
+    submit_chat.innerHTML = `
     <div class='send'>
         <input type='submit' class='submit-btn clickable'>
         ${getSVG('send', 'submit-icon')}
     </div>`;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'send-content';
+    input.placeholder = 'Ask anything here!';
+
+    submit_chat.insertAdjacentElement("afterbegin", input);
+    submit_chat.clientHeight;
+    
+    if(!conversation.history.length) {
+        toggle_expand();
+        input.focus();
+    }
 }
 
 function submitContent(evt) {
     evt.preventDefault();
+    if(conversation.pending) return;
 
     const content = evt.target['send-content'].value;
     content && (
@@ -89,8 +126,10 @@ function submitContent(evt) {
 }
 
 async function sendMessage(message, send) {
+    togglePending();
     if(!conversation.history.length) {
         main_elem.innerHTML = ''
+        updateHistoryName(conversation.id, message.substring(0, 20))
     }
     main_elem.appendChild(createBlock('out', message)[0]);
     main_elem.scrollTo({
@@ -109,6 +148,7 @@ async function sendMessage(message, send) {
     })
 
     const content = await send(response, updateMessage);
+    togglePending();
 
     appendConversationMessage([
         { type: 'out', message },

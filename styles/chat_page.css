@@ -294,6 +294,10 @@
     color: dodgerblue;
 }
 
+#chat-page #chat-main #submit-chat .send .submit-icon.pending {
+    color: gray;
+}
+
 /* 
 =====================================================
 
