@@ -153,8 +153,8 @@ async function sendMessage(message, send) {
     togglePending();
 
     appendConversationMessage([
-        { type: 'user', message },
-        { type: 'assistant', message: content}
+        { role: 'user', message },
+        { role: 'assistant', message: content}
     ], conversation.id)
 }
 
@@ -200,8 +200,8 @@ function updateConversation() {
     }
 
     main_elem.innerHTML = ''
-    conversation.history.forEach(({type, message})=>{
-        main_elem.appendChild(createBlock(type, message)[0])
+    conversation.history.forEach(({role, message})=>{
+        main_elem.appendChild(createBlock(role, message)[0])
     })
     main_elem.scrollTo({
         top: main_elem.scrollHeight, 
@@ -209,16 +209,16 @@ function updateConversation() {
     })
 }
 
-function createBlock(type, msg = '') {
+function createBlock(role, msg = '') {
     const block = document.createElement('div');
-    block.className = `conversation-block sender-${type}`;
+    block.className = `conversation-block sender-${role}`;
 
     const message = document.createElement('div');
     message.className = 'message';
 
     block.appendChild(message);
 
-    if(type === 'assistant') {
+    if(role === 'assistant') {
         message.innerHTML = `
         ${getSVG('circle-fill', 'dot-animation dot-1')}
         ${getSVG('circle-fill', 'dot-animation dot-2')}
