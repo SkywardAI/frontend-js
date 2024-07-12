@@ -14,7 +14,16 @@ const conversation_histories = {}
 let currentUser;
 
 const { onmount, remount, dismount, updateAll } = createHook();
-const { addHistory } = useHistory(null);
+const { addHistory } = useHistory(h=>{
+    if(currentConversation.id) {
+        if(!h.filter(e=>e.id === currentConversation.id).length) {
+            currentConversation = {
+                id: null, pending: false, history: []
+            };
+            updateAll(currentConversation);
+        }
+    }
+});
 useUser(user=>currentUser = user);
 
 export default function useConversation(updated) {

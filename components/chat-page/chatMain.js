@@ -7,7 +7,7 @@ import getSVG from "../../tools/svgs.js";
 
 let conversation = {}, model_settings = {}, 
     main_elem, toggle_expand,
-    stream_response=true;
+    stream_response=true, init = false;
 
 const { 
     componetDismount: conversationDismount, 
@@ -20,7 +20,16 @@ const {
     submit_icon && submit_icon.classList.toggle('pending', conversation.pending)
     if(c.id === conversation.id) return;
     conversation = c;
-    if(!conversation.id) return;
+    if(!conversation.id) {
+        if(main_elem) {
+            main_elem.innerHTML = `
+            <div class='greeting'>
+                Please select a ticket or start a new conversation on left.
+            </div>`
+            document.getElementById('submit-chat').innerHTML = '';
+        }
+        return;
+    }
 
     updateConversation();
     buildForm();
@@ -66,19 +75,22 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
         </div>
     </div>`)
 
-    if(!toggle_expand) toggle_expand = toggleExpand;
-
-    document.getElementById('submit-chat').onsubmit=submitContent;
-    main_elem = document.getElementById('conversation-main');
-    document.getElementById('toggle-sidebar-expand').onclick = toggle_expand;
-    document.getElementById('toggle-setting-page').onclick = openModelSetting;
-    document.getElementById('download-conversation').onclick = () => {
-        if(conversation.id && conversation.history.length) {
-            formatJSON(conversation, getHistory(conversation.id))
+    if(!init) {
+        toggle_expand = toggleExpand;
+        document.getElementById('submit-chat').onsubmit=submitContent;
+        main_elem = document.getElementById('conversation-main');
+        document.getElementById('toggle-sidebar-expand').onclick = toggle_expand;
+        document.getElementById('toggle-setting-page').onclick = openModelSetting;
+        document.getElementById('download-conversation').onclick = () => {
+            if(conversation.id && conversation.history.length) {
+                formatJSON(conversation, getHistory(conversation.id))
+            }
         }
+        init = true;
+    } else {
+        modelSettingsRemount();
     }
 
-    modelSettingsRemount();
     if(conversationReMount() && conversation.id) {
         updateConversation();
         buildForm();
