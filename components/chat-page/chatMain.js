@@ -129,7 +129,9 @@ async function sendMessage(message, send) {
     togglePending();
     if(!conversation.history.length) {
         main_elem.innerHTML = ''
-        updateHistoryName(conversation.id, message.substring(0, 20))
+        const message_len = message.length;
+        updateHistoryName(conversation.id, 
+        `${message.substring(0, 25)}${message_len > 25 ? '...' : ''}`)
     }
     main_elem.appendChild(createBlock('user', message)[0]);
     main_elem.scrollTo({
