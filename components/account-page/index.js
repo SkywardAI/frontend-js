@@ -102,7 +102,7 @@ function submitDetails(evt) {
             evt.target['repeat-password'].classList.add('error');
             return;
         }
-        register(username, email, password);
+        register(username, email, password).then(()=>isRegister=false);
     } else {
         const username = evt.target.username.value;
         const password = evt.target.password.value;
