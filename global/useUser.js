@@ -41,7 +41,7 @@ export default function useUser(updated) {
     }
 
     async function login(username, password) {
-        const {id, authorizedAccount} = await request('/auth/signin', {
+        const {id, authorizedAccount} = await request('auth/signin', {
             method: 'POST',
             body: { username, password }
         });
@@ -51,7 +51,7 @@ export default function useUser(updated) {
     }
 
     async function register(username, email, password) {
-        const {id, authorizedAccount} = await request('/auth/signup', {
+        const {id, authorizedAccount} = await request('auth/signup', {
             method: 'POST',
             body: { username, email, password }
         })
