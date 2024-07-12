@@ -1,6 +1,7 @@
 import request from "../tools/request.js";
 import createHook from "./createHook.js";
 import useHistory from "./useHistory.js";
+import useUser from "./useUser.js";
 
 let currentConversation = {
     id: null,
@@ -10,8 +11,11 @@ let currentConversation = {
 
 const conversation_histories = {}
 
+let currentUser;
+
 const { onmount, remount, dismount, updateAll } = createHook();
 const { addHistory } = useHistory(null);
+useUser(user=>currentUser = user);
 
 export default function useConversation(updated) {
     const mount_key = onmount(updated);
@@ -40,21 +44,27 @@ export default function useConversation(updated) {
         updateAll(currentConversation);
     }
 
-    function sendMessage(messages) {
+    async function sendMessage(messages) {
+        await request('chat/save', {
+            method: 'POST',
+            body: {
+                sessionUuid: currentConversation.id,
+                chats: messages
+            }
+        })
         currentConversation.history.push(...messages);
         updateAll(currentConversation);
     }
 
     async function selectConversation(id) {
-        // TODO: logged in user should query from backend
-
-        // const conversation_history = [];
-        // await (await request(`chat/history/${id}`))
-        // .json().forEach(({type, message})=>{
-        //     conversation_history.push({type, message});
-        // })
-        storeHistory();
-        currentConversation = { id, history: conversation_histories[id] }
+        let history;
+        if(currentUser.logged_in) {
+            history = await request(`chat/history/${id}`);
+        } else {
+            storeHistory();
+            history = conversation_histories[id];
+        }
+        currentConversation = { id, history };
         updateAll(currentConversation);
     }
 
