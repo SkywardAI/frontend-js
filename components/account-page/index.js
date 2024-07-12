@@ -1,6 +1,16 @@
 import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
+import useUser from '../../global/useUser.js'
 
-let account_dialog;
+let account_dialog = null, input_details_main = null;
+let current_user = {}, isRegister = false;
+
+const {
+    register, login, logout,
+} = useUser(user=>{
+    if(!input_details_main) return;
+    current_user = user;
+    createInputDetailsPage();
+});
 
 function toggleDialog(force = null) {
     if(!account_dialog) return false;
@@ -29,6 +39,77 @@ const account_fields = {
     ]
 }
 
+function createInputDetailsPage() {
+    input_details_main.innerHTML = '';
+    // input fields
+    account_fields[
+        current_user.logged_in ? 'logged_in' : 
+        isRegister ? 'register' : 'login'
+    ]
+    .forEach(e=>{
+        input_details_main.appendChild(
+            createAccountInputFields(e)
+        )
+    })
+    // hr
+    input_details_main.insertAdjacentHTML("beforeend", "<hr>")
+    // buttons
+    const submit_btn = document.createElement('button');
+    submit_btn.type = 'submit';
+    submit_btn.className = 'function-btn clickable';
+    input_details_main.appendChild(submit_btn);
+
+    const functional_btn = document.createElement('button');
+    functional_btn.type = 'button';
+    functional_btn.className = 'function-btn reverse-color clickable';
+    input_details_main.appendChild(functional_btn);
+
+    function updateBtnText() {
+        submit_btn.textContent = 
+            current_user.logged_in ? 'Update' :
+            isRegister ? 'Register Now' : 'Login Now';
+
+        functional_btn.textContent = 
+            current_user.logged_in ? 'Logout' :
+            isRegister ? 'I want to Login!' : 'I want to Register!';
+    }
+    updateBtnText();
+
+    functional_btn.onclick = evt => {
+        evt.preventDefault();
+        if(current_user.logged_in) {
+            logout();
+        } else {
+            updateBtnText();
+            isRegister = !isRegister;
+            createInputDetailsPage();
+        }
+    }
+
+}
+
+function submitDetails(evt) {
+    evt.preventDefault();
+    
+    if(current_user.logged_in) {return;}
+    else if(isRegister) {
+        const username = evt.target.username.value;
+        const email = evt.target.email.value;
+        const password = evt.target.password.value;
+        const repeat_password = evt.target['repeat-password'].value;
+
+        if(password !== repeat_password) {
+            evt.target['repeat-password'].classList.add('error');
+            return;
+        }
+        register(username, email, password);
+    } else {
+        const username = evt.target.username.value;
+        const password = evt.target.password.value;
+        login(username, password);
+    }
+}
+
 export default function createAccountPage() {
     if(toggleDialog()) return;
 
@@ -39,35 +120,18 @@ export default function createAccountPage() {
     const account_main_page = document.createElement('form');
     account_main_page.className = 'account-main';
     account_main_page.onclick = evt => evt.stopPropagation();
+    account_main_page.onsubmit = submitDetails;
 
     account_main_page.insertAdjacentHTML("afterbegin", `
     <div class='logo-image'><img src='/medias/SkywardAI.png'></div>`)
 
-    const input_main = document.createElement('div');
-    input_main.className = 'input-details-main';
+    input_details_main = document.createElement('div');
+    input_details_main.className = 'input-details-main';
+    
+    account_main_page.appendChild(input_details_main);
+    account_dialog.appendChild(account_main_page);
 
-    // TODO: if logged in
-    account_fields.login.forEach(e=>{
-        input_main.appendChild(createAccountInputFields(e))
-    })
-
-    input_main.insertAdjacentHTML("beforeend", "<hr>")
-
-    const submit_button = document.createElement('button')
-    submit_button.type = 'submit'
-    submit_button.className = 'submit-button clickable'
-    submit_button.textContent = 'Login'
-    input_main.appendChild(submit_button)
-
-    const switch_btn = document.createElement('button')
-    switch_btn.type = 'submit'
-    switch_btn.className = 'submit-button reverse-color clickable'
-    switch_btn.textContent = 'I want to register'
-    input_main.appendChild(switch_btn)
-
-    account_main_page.appendChild(input_main)
-    account_dialog.appendChild(account_main_page)
-
+    createInputDetailsPage();
     toggleDialog();
 }
 
@@ -81,6 +145,7 @@ function createAccountInputFields({index, title = null, type = null}) {
 
     const input = document.createElement('input');
     input.type = type || 'text';
+    input.name = index;
 
     field_container.appendChild(title_element);
     field_container.appendChild(input);
