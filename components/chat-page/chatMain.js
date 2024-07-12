@@ -147,7 +147,7 @@ async function sendMessage(message, send) {
             sessionUuid: conversation.id || "uuid", 
             message, ...model_settings
         }
-    })
+    }, true)
 
     const content = await send(response, updateMessage);
     togglePending();

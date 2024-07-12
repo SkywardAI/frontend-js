@@ -23,7 +23,7 @@ export default function useConversation(updated) {
 
     async function startNewConversation() {
         storeHistory();
-        const { sessionUuid } = await (await request('chat/seesionuuid')).json();
+        const { sessionUuid } = await request('chat/seesionuuid');
         currentConversation = {
             id: sessionUuid, history: []
         };

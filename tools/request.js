@@ -4,8 +4,21 @@ import useSessionId from "../global/useSessionId.js";
 let session_id = '';
 useSessionId(id=>{session_id = id});
 
-export default function request(url, options={}) {
-    return fetch(reqAddress(url), generateRequest(url, options))
+export default async function request(url, options={}, not_return_json = false) {
+    let res = null;
+    try {
+        const address = reqAddress(url);
+        const request_options = generateRequest(url, options);
+        if(not_return_json) {
+            return fetch(address, request_options);
+        } else {
+            res = await fetch(address, request_options);
+            return await res.json();
+        }
+    } catch (error) {
+        console.error(error);
+        return res || {}
+    }
 }
 
 export function reqAddress(url) {

@@ -9,7 +9,7 @@ export default function useSessionId(updated) {
     const mount_key = onmount(updated)
 
     async function genSession() {
-        const { token } = await (await request('auth/token')).json()
+        const { token } = await request('auth/token');
         currentSession = token;
         updateAll(currentSession);
     }

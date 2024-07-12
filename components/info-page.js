@@ -16,8 +16,7 @@ export default function createInfoPage() {
 
 async function updateVersions() {
 
-    const query_versions = await (await request('version')).json();
-
+    const query_versions = await request('version');
     const versions = {
         rebel: `v${VERSION}`,
         ...query_versions

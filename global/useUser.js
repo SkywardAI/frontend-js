@@ -41,10 +41,10 @@ export default function useUser(updated) {
     }
 
     async function register(username, email, password) {
-        const {id, authorizedAccount} = await (await request('/auth/signup', {
+        const {id, authorizedAccount} = await request('/auth/signup', {
             method: 'POST',
             body: { username, email, password }
-        })).json()
+        })
 
         const { token } = authorizedAccount;
         userInfo = {
