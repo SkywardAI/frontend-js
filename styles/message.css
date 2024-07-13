@@ -39,11 +39,12 @@
     background-color: white;
     border: 1px solid;
     color: dodgerblue;
+    background-color: rgb(245, 250, 255);
 }
 
-.message.err,.message.error { color: red; }
-.message.warn,.message.warning { color: goldenrod; }
-.message.success { color: limegreen; }
+.message.err,.message.error { color: red; background-color: rgb(255, 244, 244); }
+.message.warn,.message.warning { color: goldenrod; background-color: rgb(255, 254, 240); }
+.message.success { color: limegreen; background-color: rgb(240, 253, 240); }
 
 .message-dialog .message .message-icon {
     width: 30px;
