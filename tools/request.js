@@ -29,7 +29,7 @@ function generateRequest(url, options={}) {
     const headers = {
         Accept: 'application/json'
     }
-    if(options.method && options.method === 'POST') {
+    if(options.method && /^(POST|PATCH)$/i.test(options.method)) {
         headers['Content-Type'] = 'application/json'
     }
     if(/^(chat|accounts).*$/.test(url) && session_id) {
