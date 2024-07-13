@@ -42,7 +42,9 @@ dialog {
     padding: 0;
     margin: 0;
     background-color: transparent;
+    outline: none;
 }
+dialog:focus-visible { outline: none !important; }
 
 .clickable:hover {
     cursor: pointer;

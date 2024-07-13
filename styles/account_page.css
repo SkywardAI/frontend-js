@@ -1,3 +1,15 @@
+#user-popup-container {
+    content: '';
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    display: none;
+}
+
 .account-main {
     --img-width: 60%;
     --details-width: calc(100% - var(--img-width));
