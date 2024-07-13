@@ -3,7 +3,7 @@ import getSVG from "./svgs.js";
 const message_dialog = document.createElement('dialog');
 message_dialog.className = 'message-dialog';
 document.body.appendChild(message_dialog);
-message_dialog.showModal();
+message_dialog.show();
 
 /**
  * @typedef messageOptions
