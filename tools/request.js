@@ -5,19 +5,18 @@ let session_id = '';
 useSessionId(id=>{session_id = id});
 
 export default async function request(url, options={}, not_return_json = false) {
-    let res = null;
-    try {
-        const address = reqAddress(url);
-        const request_options = generateRequest(url, options);
-        if(not_return_json) {
-            return fetch(address, request_options);
+    // let res = null;
+    const address = reqAddress(url);
+    const request_options = generateRequest(url, options);
+    if(not_return_json) {
+        return fetch(address, request_options);
+    } else {
+        const res = await fetch(address, request_options);
+        if(res.ok) {
+            return res.json()
         } else {
-            res = await fetch(address, request_options);
-            return await res.json();
+            return { http_error: true }
         }
-    } catch (error) {
-        console.error(error);
-        return res || {}
     }
 }
 
