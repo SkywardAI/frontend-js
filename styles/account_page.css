@@ -29,7 +29,7 @@
 
 .account-main .input-details-main {
     --item-width: 230px;
-    --item-height: 40px;
+    --item-height: 45px;
 
     position: absolute;
     width: calc(var(--details-width) - 20px);
@@ -45,38 +45,70 @@
 }
 
 .input-details-main .account-field-container {
-    width: fit-content;
-    height: fit-content;
+    width: var(--item-width);
+    height: var(--item-height);
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     max-width: 100%;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+.input-details-main .account-field-container:hover {
+    cursor: text;
+}
+
+.input-details-main .account-field-container:has(input:focus) {
+    border-color: dodgerblue;
 }
 
 .input-details-main .account-field-container .title {
+    position: absolute;
+    color: gray;
     font-size: 18px;
-    margin-bottom: 5px;
-    font-weight: bold;
-    position: relative;
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    line-height: var(--item-height);
+    left: 10px;
+    top: 0px;
+    transition-duration: .5s;
+    transform-origin: top left;
+    user-select: none;
+}
+
+.input-details-main .account-field-container:has(input:focus) .title,
+.input-details-main .account-field-container:has(input:not(:placeholder-shown)) .title
+ {
+    transform: scale(0.6);
+}
+.input-details-main .account-field-container:has(input:focus) .title {
+    color: dodgerblue;
 }
 
 .input-details-main .account-field-container input {
-    width: var(--item-width);
-    height: var(--item-height);
-    border: 1px solid gray;
-    border-radius: 5px;
+    width: 100%;
+    height: 30%;
+    border: none;
     box-sizing: border-box;
     padding: 0px 15px;
     font-size: 16px;
-    position: relative;
+    position: absolute;
     max-width: 100%;
+    bottom: 5px;
+    background-color: transparent;
 }
 .input-details-main .account-field-container input:focus {
     outline: none;
 }
-.input-details-main .account-field-container input.error {
-    border-color: red;
+
+.password-eye-icon {
+    position: absolute;
+    height: var(--item-height);
+    width: var(--item-height);
+    display: flex;
+    align-items: center;
+    right: 0;
 }
+.password-eye-icon svg { margin: auto; }
 
 .input-details-main hr {
     width: var(--item-width);
@@ -89,7 +121,7 @@
 
 .input-details-main .function-btn {
     width: var(--item-width);
-    height: calc(var(--item-height) + 5px);
+    height: calc(var(--item-height) - 3px);
     border-radius: 16px;
     background-color: dodgerblue;
     color: white;
@@ -97,7 +129,7 @@
     border: none;
     font-size: 18px;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 17px;
     display: block;
     position: relative;
     max-width: 100%;

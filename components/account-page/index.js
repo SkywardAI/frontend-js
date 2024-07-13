@@ -1,5 +1,6 @@
-import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
 import useUser from '../../global/useUser.js'
+import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
+import getSVG from "../../tools/svgs.js";
 
 let account_dialog = null, input_details_main = null;
 let current_user = {}, isRegister = false;
@@ -108,7 +109,9 @@ function submitDetails(evt) {
         const new_password = evt.target['new-password'].value;
         const repeat_new_password = evt.target['repeat-new-password'].value;
         const submit_values = {}
-        if(email) submit_values.email = email;
+        if(email && email !== current_user.email) {
+            submit_values.email = email;
+        }
         if(new_password) {
             if(repeat_new_password !== new_password) {
                 evt.target['repeat-new-password'].classList.add('error');
@@ -178,13 +181,35 @@ function createAccountInputFields({
     input.type = type || 'text';
     input.name = index;
     input.value = value;
+    input.placeholder = ' '
+    input.autocomplete = 'off'
     if(readonly) input.readOnly = 'true';
 
+    field_container.onclick = () => input.focus();
     field_container.appendChild(title_element);
     field_container.appendChild(input);
 
     if(type === 'password') {
-        // TODO
+        let show_password = false;
+        
+        const eye_icon = document.createElement('div');
+        eye_icon.className = 'password-eye-icon clickable';
+
+        const toggleShowPassword = () => {
+            if(!show_password) {
+                input.type = 'password';
+                eye_icon.innerHTML = getSVG('eye');
+                eye_icon.title = 'Show Password';
+            } else {
+                input.type = 'text';
+                eye_icon.innerHTML = getSVG('eye-slash');
+                eye_icon.title = 'Hide Password';
+            }
+            show_password = !show_password;
+        }
+        toggleShowPassword();
+        eye_icon.onclick = toggleShowPassword;
+        field_container.appendChild(eye_icon);
     }
 
     return field_container;
