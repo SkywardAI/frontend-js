@@ -23,6 +23,7 @@
     top: 10vh;
     background-color: white;
     border-radius: 15px;
+    overflow-x: hidden;
 }
 
 .account-main .logo-image {
@@ -40,14 +41,14 @@
 }
 
 .account-main .input-details-main {
-    --item-width: 230px;
+    --item-width: 250px;
     --item-height: 45px;
 
     position: absolute;
-    width: calc(var(--details-width) - 20px);
+    width: var(--item-width);
     height: calc(100% - 40px);
     top: 0;
-    right: 0;
+    left: var(--img-width);
     align-content: center;
     overflow-y: auto;
     overflow-x: hidden;
@@ -57,11 +58,10 @@
 }
 
 .input-details-main .account-field-container {
-    width: var(--item-width);
+    width: 100%;
     height: var(--item-height);
     position: relative;
     margin-bottom: 15px;
-    max-width: 100%;
     border: 1px solid gray;
     border-radius: 5px;
 }
@@ -98,7 +98,7 @@
 
 .input-details-main .account-field-container input {
     width: 100%;
-    height: 30%;
+    height: 40%;
     border: none;
     box-sizing: border-box;
     padding: 0px 15px;
@@ -121,6 +121,20 @@
     right: 0;
 }
 .password-eye-icon svg { margin: auto; }
+
+.input-details-main .keep-login {
+    display: flex;
+    height: fit-content;
+    width: fit-content;
+    align-items: center;
+    margin: auto;
+}
+.input-details-main .keep-login * { margin: auto; }
+.input-details-main .keep-login input[type='checkbox']{
+    width: 17px;
+    height: 17px;
+    margin-right: 10px;
+}
 
 .input-details-main hr {
     width: var(--item-width);
