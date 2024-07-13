@@ -4,7 +4,8 @@ import getSVG from "../../tools/svgs.js";
 import showMessage from "../../tools/message.js";
 
 let account_container = null, input_details_main = null, init = false, open_status = false;
-let current_user = {}, isRegister = false;
+let current_user = {}, isRegister = false, user_info_saved = localStorage.getItem('saved-user-login-info');
+if(user_info_saved) user_info_saved = JSON.parse(user_info_saved);
 
 const {
     register, login, logout, updateUserInfo
@@ -27,10 +28,20 @@ function toggleDialog(force = null) {
     return true;
 }
 
+function saveUserInfo(save_info = null) {
+    if(!save_info) {
+        user_info_saved && localStorage.removeItem('saved-user-login-info');
+        user_info_saved = null;
+    } else {
+        user_info_saved = save_info
+        localStorage.setItem('saved-user-login-info', JSON.stringify(save_info))
+    }
+}
+
 const account_fields = {
     login: [
         { index: 'username' },
-        { index: 'password', type: 'password' },
+        { index: 'password', type: 'password' }
     ],
     register: [
         { index: 'username' },
@@ -54,21 +65,33 @@ function createInputDetailsPage() {
         isRegister ? 'register' : 'login'
     ]
     .forEach(e=>{
+        const field = {...e};
         if(current_user.logged_in) {
-            if(e.index === 'username') e.value = current_user.username;
-            else if(e.index === 'email') e.value = current_user.email;
-        } else if(!isRegister) {
-            const saved_user_login_info = localStorage.getItem('saved-user-login-info');
-            if(saved_user_login_info) {
-                const info = JSON.parse(saved_user_login_info);
-                if(e.index === 'username') e.value = info.username;
-                else if(e.index === 'email') e.value = info.password;
-            }
+            if(e.index === 'username') field.value = current_user.username;
+            else if(e.index === 'email') field.value = current_user.email;
+        } else if(!isRegister && user_info_saved) {
+            if(e.index === 'username') field.value = user_info_saved.username;
+            else if(e.index === 'password') field.value = user_info_saved.password;
         }
         input_details_main.appendChild(
-            createAccountInputFields(e)
+            createAccountInputFields(field)
         )
     })
+
+    if(!current_user.logged_in) {
+        const keep_login = document.createElement('div')
+        keep_login.className = 'keep-login clickable';
+
+        keep_login.innerHTML = `
+        <input type='checkbox' name='keep-login'${user_info_saved?' checked':''}>
+        <div class="title">Keep me logged in!</div>`
+
+        input_details_main.appendChild(keep_login);
+        keep_login.onclick = () => {
+            keep_login.firstElementChild.click();
+        }
+    }
+
     // hr
     input_details_main.insertAdjacentHTML("beforeend", "<hr>")
     // buttons
@@ -96,7 +119,7 @@ function createInputDetailsPage() {
     functional_btn.onclick = evt => {
         evt.preventDefault();
         if(current_user.logged_in) {
-            logout().then(()=>showMessage('User Logged Out.'));
+            logout().then(()=>showMessage('User logged out.'));
         } else {
             updateBtnText();
             isRegister = !isRegister;
@@ -108,7 +131,7 @@ function createInputDetailsPage() {
 
 function submitDetails(evt) {
     evt.preventDefault();
-    
+
     if(current_user.logged_in) {
         const email = evt.target.email.value;
         const new_password = evt.target['new-password'].value;
@@ -134,30 +157,35 @@ function submitDetails(evt) {
                 showMessage('Update information failed!', { type: 'err' })
             }
         });
-    } else if(isRegister) {
-        const username = evt.target.username.value;
-        const email = evt.target.email.value;
-        const password = evt.target.password.value;
-        const repeat_password = evt.target['repeat-password'].value;
-
-        if(password !== repeat_password) {
-            showMessage("Passwords are not same!", { type: 'err' })
-            return;
-        }
-        register(username, email, password).then(res=>{
-            if(res) {
-                isRegister=false;
-                showMessage('Register Success!', { type: 'success' });
-            } else showMessage('Register failed!', { type: 'err' })
-        });
     } else {
         const username = evt.target.username.value;
         const password = evt.target.password.value;
-        login(username, password).then(res=>{
-            if(res) showMessage(`Welcome back, ${username}`);
-            else showMessage('Login failed!', { type: 'err' })
-        });
-    }
+        const keep_login = evt.target['keep-login'].checked;
+        if(isRegister) {
+            const email = evt.target.email.value;
+            const repeat_password = evt.target['repeat-password'].value;
+    
+            if(password !== repeat_password) {
+                showMessage("Passwords are not same!", { type: 'err' })
+                return;
+            }
+            register(username, email, password).then(res=>{
+                if(res) {
+                    isRegister=false;
+                    showMessage('Register Success!', { type: 'success' });
+                    saveUserInfo(keep_login && { username, password });
+                } else showMessage('Register failed!', { type: 'err' });
+            });
+        } else {
+            login(username, password).then(res=>{
+                if(res) {
+                    showMessage(`Welcome back, ${username}`);
+                    saveUserInfo(keep_login && { username, password });
+                }
+                else showMessage('Login failed!', { type: 'err' })
+            });
+        }
+    } 
 }
 
 export default function createAccountPage() {
