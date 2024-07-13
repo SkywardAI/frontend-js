@@ -41,23 +41,29 @@ export default function useUser(updated) {
     }
 
     async function login(username, password) {
-        const {id, authorizedAccount} = await request('auth/signin', {
+        const {id, authorizedAccount, http_error} = await request('auth/signin', {
             method: 'POST',
             body: { username, password }
         });
 
+        if(http_error) return false;
+
         const { token, email } = authorizedAccount;
         setLoggedIn(id, username, email, token);
+        return true;
     }
 
     async function register(username, email, password) {
-        const {id, authorizedAccount} = await request('auth/signup', {
+        const {id, authorizedAccount, http_error} = await request('auth/signup', {
             method: 'POST',
             body: { username, email, password }
         })
 
+        if(http_error) return false;
+
         const { token } = authorizedAccount;
         setLoggedIn(id, username, email, token);
+        return true;
     }
 
     async function logout() {
@@ -75,11 +81,11 @@ export default function useUser(updated) {
     }
 
     async function updateUserInfo(fields) {
-        const {id, authorizedAccount, detail} = await request('accounts', {
+        const {id, authorizedAccount, http_error} = await request('accounts', {
             method: 'PATCH',
             body: fields
         })
-        if(!detail) {
+        if(!http_error) {
             userInfo = {
                 ...userInfo,
                 id, email: authorizedAccount.email
