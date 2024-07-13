@@ -1,0 +1,59 @@
+.message-dialog {
+    pointer-events: none;
+    z-index: 100;
+}
+
+.message-dialog::backdrop {
+    background-color: transparent;
+}
+
+.message-dialog * {
+    pointer-events: initial;
+}
+
+
+@keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slide-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+.message-dialog .message {
+    position: relative;
+    margin-right: 5px;
+    margin-left: auto;
+    width: fit-content;
+    height: fit-content;
+    min-width: 300px;
+    min-height: 50px;
+    padding: 10px 15px;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    animation: slide-in forwards;
+    margin-bottom: 5px;
+    background-color: white;
+    border: 1px solid;
+    color: dodgerblue;
+}
+
+.message.err,.message.error { color: red; }
+.message.warn,.message.warning { color: goldenrod; }
+.message.success { color: limegreen; }
+
+.message-dialog .message .message-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 20px;
+    color: inherit;
+}
+
+.message-dialog .message .message-text {
+    font-size: 17px;
+    padding: 5px 0px;
+    color: black;
+}
