@@ -74,10 +74,24 @@ export default function useUser(updated) {
         requestUpdateHistory();
     }
 
+    async function updateUserInfo(fields) {
+        const {id, authorizedAccount, detail} = await request('accounts', {
+            method: 'PATCH',
+            body: fields
+        })
+        if(!detail) {
+            userInfo = {
+                ...userInfo,
+                id, email: authorizedAccount.email
+            }
+            return true;
+        } return false;
+    }
+
     updated && updated(userInfo);
 
     return {
-        login, register, logout,
+        login, register, logout, updateUserInfo,
         componetDismount: dismount(mount_key), componentReMount:remount(mount_key) 
     }
 }

@@ -5,7 +5,7 @@ let account_dialog = null, input_details_main = null;
 let current_user = {}, isRegister = false;
 
 const {
-    register, login, logout,
+    register, login, logout, updateUserInfo
 } = useUser(user=>{
     if(!input_details_main) return;
     current_user = user;
@@ -30,12 +30,13 @@ const account_fields = {
         { index: 'username' },
         { index: 'email' },
         { index: 'password', type: 'password' },
-        { index: 'repeat-password', title: 'Repeat Password', type: 'password' }
+        { index: 'repeat-password', title: 'Confirm Password', type: 'password' }
     ],
     logged_in: [
-        { index: 'username', title: 'Update Username' },
+        { index: 'username', readonly: true },
         { index: 'email', title: 'Update Email' },
-        { index: 'password', title: 'Update Password', type: 'password' },
+        { index: 'new-password', title: 'New Password', type: 'password' },
+        { index: 'repeat-new-password', title: 'Confirm New Password', type: 'password' },
     ]
 }
 
@@ -47,6 +48,17 @@ function createInputDetailsPage() {
         isRegister ? 'register' : 'login'
     ]
     .forEach(e=>{
+        if(current_user.logged_in) {
+            if(e.index === 'username') e.value = current_user.username;
+            else if(e.index === 'email') e.value = current_user.email;
+        } else if(!isRegister) {
+            const saved_user_login_info = localStorage.getItem('saved-user-login-info');
+            if(saved_user_login_info) {
+                const info = JSON.parse(saved_user_login_info);
+                if(e.index === 'username') e.value = info.username;
+                else if(e.index === 'email') e.value = info.password;
+            }
+        }
         input_details_main.appendChild(
             createAccountInputFields(e)
         )
@@ -91,8 +103,24 @@ function createInputDetailsPage() {
 function submitDetails(evt) {
     evt.preventDefault();
     
-    if(current_user.logged_in) {return;}
-    else if(isRegister) {
+    if(current_user.logged_in) {
+        const email = evt.target.email.value;
+        const new_password = evt.target['new-password'].value;
+        const repeat_new_password = evt.target['repeat-new-password'].value;
+        const submit_values = {}
+        if(email) submit_values.email = email;
+        if(new_password) {
+            if(repeat_new_password !== new_password) {
+                evt.target['repeat-new-password'].classList.add('error');
+                return;
+            }
+            submit_values.password = new_password;
+        }
+        updateUserInfo(submit_values).then(res=>{
+            // TODO: show updated or not
+            console.log(res)
+        });
+    } else if(isRegister) {
         const username = evt.target.username.value;
         const email = evt.target.email.value;
         const password = evt.target.password.value;
@@ -135,7 +163,10 @@ export default function createAccountPage() {
     toggleDialog();
 }
 
-function createAccountInputFields({index, title = null, type = null}) {
+function createAccountInputFields({
+    index, title = '', type = '', 
+    readonly = false, value = ''
+}) {
     const field_container = document.createElement('div');
     field_container.className = 'account-field-container';
 
@@ -146,6 +177,8 @@ function createAccountInputFields({index, title = null, type = null}) {
     const input = document.createElement('input');
     input.type = type || 'text';
     input.name = index;
+    input.value = value;
+    if(readonly) input.readOnly = 'true';
 
     field_container.appendChild(title_element);
     field_container.appendChild(input);
