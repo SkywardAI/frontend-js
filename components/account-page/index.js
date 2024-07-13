@@ -1,8 +1,9 @@
 import useUser from '../../global/useUser.js'
 import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
 import getSVG from "../../tools/svgs.js";
+import showMessage from "../../tools/message.js";
 
-let account_dialog = null, input_details_main = null;
+let account_container = null, input_details_main = null, init = false, open_status = false;
 let current_user = {}, isRegister = false;
 
 const {
@@ -14,10 +15,14 @@ const {
 });
 
 function toggleDialog(force = null) {
-    if(!account_dialog) return false;
+    if(!init) return false;
 
-    let open_status = force === null ? !account_dialog.open : force;
-    open_status ? account_dialog.showModal() : account_dialog.close();
+    open_status = force === null ? !open_status : force;
+    if(open_status) {
+        account_container.style.display = 'block';
+    } else {
+        account_container.style.display = 'none';
+    }
 
     return true;
 }
@@ -91,7 +96,7 @@ function createInputDetailsPage() {
     functional_btn.onclick = evt => {
         evt.preventDefault();
         if(current_user.logged_in) {
-            logout();
+            logout().then(()=>showMessage('User Logged Out.'));
         } else {
             updateBtnText();
             isRegister = !isRegister;
@@ -114,14 +119,20 @@ function submitDetails(evt) {
         }
         if(new_password) {
             if(repeat_new_password !== new_password) {
-                evt.target['repeat-new-password'].classList.add('error');
+            showMessage("Passwords are not same!", { type: 'err' })
                 return;
             }
             submit_values.password = new_password;
         }
         updateUserInfo(submit_values).then(res=>{
-            // TODO: show updated or not
-            console.log(res)
+            if(res) {
+                submit_values.email && showMessage('Email updated.');
+                submit_values.password && showMessage('Password updated.');
+                evt.target['new-password'].value = ''
+                evt.target['repeat-new-password'].value = ''
+            } else {
+                showMessage('Update information failed!', { type: 'err' })
+            }
         });
     } else if(isRegister) {
         const username = evt.target.username.value;
@@ -130,23 +141,30 @@ function submitDetails(evt) {
         const repeat_password = evt.target['repeat-password'].value;
 
         if(password !== repeat_password) {
-            evt.target['repeat-password'].classList.add('error');
+            showMessage("Passwords are not same!", { type: 'err' })
             return;
         }
-        register(username, email, password).then(()=>isRegister=false);
+        register(username, email, password).then(res=>{
+            if(res) {
+                isRegister=false;
+                showMessage('Register Success!', { type: 'success' });
+            } else showMessage('Register failed!', { type: 'err' })
+        });
     } else {
         const username = evt.target.username.value;
         const password = evt.target.password.value;
-        login(username, password);
+        login(username, password).then(res=>{
+            if(res) showMessage(`Welcome back, ${username}`);
+            else showMessage('Login failed!', { type: 'err' })
+        });
     }
 }
 
 export default function createAccountPage() {
     if(toggleDialog()) return;
 
-    account_dialog = document.createElement('dialog');
-    account_dialog.onclick = () => toggleDialog(false);
-    document.getElementById('user-popup-container').appendChild(account_dialog)
+    account_container = document.getElementById('user-popup-container');
+    account_container.onclick = () => toggleDialog(false);
 
     const account_main_page = document.createElement('form');
     account_main_page.className = 'account-main';
@@ -160,9 +178,11 @@ export default function createAccountPage() {
     input_details_main.className = 'input-details-main';
     
     account_main_page.appendChild(input_details_main);
-    account_dialog.appendChild(account_main_page);
+    account_container.appendChild(account_main_page)
 
     createInputDetailsPage();
+
+    init = true;
     toggleDialog();
 }
 
