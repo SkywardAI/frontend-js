@@ -90,6 +90,7 @@ export default function useUser(updated) {
                 ...userInfo,
                 id, email: authorizedAccount.email
             }
+            updateAll(userInfo);
             return true;
         } return false;
     }
