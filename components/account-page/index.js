@@ -78,6 +78,7 @@ function createInputDetailsPage() {
         keep_login.onclick = () => {
             keep_login.firstElementChild.click();
         }
+        keep_login.firstElementChild.onclick = evt => evt.stopPropagation();
     }
 
     // hr
