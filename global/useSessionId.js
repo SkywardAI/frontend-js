@@ -1,31 +1,42 @@
 import request from "../tools/request.js";
 import createHook from "./createHook.js";
+import cookies from "../tools/cookies.js";
 
-let currentSession = null, init = false;
+const cookie = cookies();
+let currentSession = cookie.getItem('current-session') || null;
 
 const { onmount, remount, dismount, updateAll } = createHook();
+
+function updateCookie() {
+    cookie.setItem('current-session', currentSession);
+}
+
+async function genSession() {
+    const { token } = await request('auth/token');
+    currentSession = token;
+    updateCookie();
+    updateAll(currentSession);
+}
+
+function manualUpdateSession(sessionId) {
+    currentSession = sessionId;
+    updateCookie();
+    updateAll(currentSession);
+}
+
+if(!currentSession) genSession();
 
 export default function useSessionId(updated) {
     const mount_key = onmount(updated)
 
-    async function genSession() {
-        const { token } = await request('auth/token');
-        currentSession = token;
-        updateAll(currentSession);
+    function componentReMount() {
+        return remount(mount_key)(currentSession)
     }
 
-    function manualUpdateSession(sessionId) {
-        currentSession = sessionId;
-        updateAll(currentSession);
-    }
-
-    if(!currentSession && !init) {
-        init = true;
-        genSession();
-    }
+    updated && updated(currentSession);
 
     return {
         manualUpdateSession, genSession,
-        componetDismount: dismount(mount_key), componentReMount:remount(mount_key) 
+        componetDismount: dismount(mount_key), componentReMount
     }
 }
