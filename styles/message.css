@@ -1,11 +1,18 @@
 .message-dialog {
-    pointer-events: none;
-    z-index: 100;
-}
-
-.message-dialog::backdrop {
+    position: fixed;
     background-color: transparent;
+    border: none;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    outline: none;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
 }
+.message-dialog:focus-visible { outline: none !important; }
 
 .message-dialog * {
     pointer-events: initial;
