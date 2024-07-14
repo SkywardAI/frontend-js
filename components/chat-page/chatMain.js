@@ -6,9 +6,11 @@ import showMessage from "../../tools/message.js";
 import request from "../../tools/request.js";
 import getSVG from "../../tools/svgs.js";
 
-let conversation = {}, model_settings = {}, 
+let conversation = {pending: false}, model_settings = {}, 
     main_elem, toggle_expand,
     stream_response=true;
+
+let abort_controller;
 
 const { 
     componetDismount: conversationDismount, 
@@ -17,8 +19,8 @@ const {
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
     conversation.pending = c.pending;
-    const submit_icon = document.querySelector('#submit-chat .send svg.submit-icon');
-    submit_icon && submit_icon.classList.toggle('pending', conversation.pending)
+    const submit_chat_form = document.getElementById('submit-chat')
+    submit_chat_form && submit_chat_form.classList.toggle('pending', conversation.pending);
     if(c.id === conversation.id) return;
     conversation = c;
     if(!conversation.id) {
@@ -102,9 +104,9 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
 function buildForm() {
     const submit_chat =  document.getElementById('submit-chat')
     submit_chat.innerHTML = `
-    <div class='send'>
-        <input type='submit' class='submit-btn clickable'>
-        ${getSVG('send', 'submit-icon')}
+    <div class='right-button'>
+        <input type='submit' class='btn clickable'>
+        ${getSVG('send', 'icon send')}
     </div>`;
 
     const input = document.createElement('input');
@@ -114,7 +116,15 @@ function buildForm() {
 
     submit_chat.insertAdjacentElement("afterbegin", input);
     submit_chat.clientHeight;
-    
+
+    const abortMessage = document.createElement('div');
+    abortMessage.className = 'right-button abort-message clickable'
+    abortMessage.onclick = () => {
+        conversation.pending && abort_controller.abort();
+    }
+    abortMessage.innerHTML = getSVG('stop-circle-fill', 'icon');
+    submit_chat.appendChild(abortMessage);
+
     if(!conversation.history.length) {
         toggle_expand();
         input.focus();
@@ -125,18 +135,24 @@ function submitContent(evt) {
     evt.preventDefault();
     if(conversation.pending) {
         showMessage(
-            "Please wait until assistant finished response.",
+            "Please wait until assistant finished response or abort manually.",
             { type: 'warn' }
         )
         return;
     }
 
     const content = evt.target['send-content'].value;
-    content && (
+    if(content) {
         stream_response ? 
         sendMessageStream(content) : 
         sendMessageWaiting(content)
-    )
+    } else {
+        showMessage(
+            "Message is empty, feel free to ask anything!",
+            { type: 'warn' }
+        )
+        return;
+    }
     evt.target['send-content'].value = ''
 }
 
@@ -156,21 +172,34 @@ async function sendMessage(message, send) {
     const [bot_answer, updateMessage] = createBlock('assistant');
     main_elem.appendChild(bot_answer);
 
-    const response = await request('chat', {
-        method: 'POST',
-        body: { 
-            sessionUuid: conversation.id || "uuid", 
-            message, ...model_settings
-        }
-    }, true)
-
-    const content = await send(response, updateMessage);
-    togglePending();
-
-    appendConversationMessage([
-        { role: 'user', message },
-        { role: 'assistant', message: content}
-    ], conversation.id)
+    let content = ''
+    try {
+        abort_controller = new AbortController();
+        const response = await request('chat', {
+            method: 'POST',
+            signal: abort_controller.signal,
+            body: { 
+                sessionUuid: conversation.id || "uuid", 
+                message, ...model_settings
+            }
+        }, true)
+    
+        await send(response, msg=>{
+            content = msg;
+            updateMessage(msg);
+        });
+    } catch(error) {
+        error;
+        if(content) content+=' ...'
+        content += '(Message Abroted)'
+        updateMessage(content)
+    } finally {
+        appendConversationMessage([
+            { role: 'user', message },
+            { role: 'assistant', message: content}
+        ], conversation.id);
+        togglePending();
+    }
 }
 
 function sendMessageWaiting(msg) {

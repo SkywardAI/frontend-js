@@ -38,7 +38,7 @@ export default function useConversation(updated) {
         storeHistory();
         const { sessionUuid } = await request('chat/seesionuuid');
         currentConversation = {
-            id: sessionUuid, history: []
+            pending: false, id: sessionUuid, history: []
         };
         addHistory({
             id: currentConversation.id,
