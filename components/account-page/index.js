@@ -11,8 +11,8 @@ if(user_info_saved) user_info_saved = JSON.parse(user_info_saved);
 const {
     register, login, logout, updateUserInfo
 } = useUser(user=>{
-    if(!input_details_main) return;
     current_user = user;
+    if(!input_details_main) return;
     createInputDetailsPage();
 });
 
