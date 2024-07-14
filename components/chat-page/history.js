@@ -1,7 +1,7 @@
 import useConversation from "../../global/useConversation.js";
 import useHistory from "../../global/useHistory.js";
 
-let history = [], history_elem = null, last_selected_id;
+let history = [], history_elem = null, last_selected_id=null;
 
 const { componetDismount:historyDismount, componentReMount: historyRemount } = useHistory(h=>{
     history = structuredClone(h);
@@ -24,6 +24,8 @@ export default function createChatHistory(main) {
     history_elem = document.createElement('div');
     history_elem.id = 'chat-history';
     main.insertAdjacentElement('beforeend', history_elem);
+
+    last_selected_id = null;
 
     // re-mount update listeners
     historyRemount();
