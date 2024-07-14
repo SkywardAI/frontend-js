@@ -2,8 +2,9 @@ import useUser from '../../global/useUser.js'
 import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
 import getSVG from "../../tools/svgs.js";
 import showMessage from "../../tools/message.js";
+import createDialog from '../../tools/dialog.js';
 
-let account_container = null, input_details_main = null, init = false, open_status = false;
+let input_details_main = null, init = false, toggleDialog;
 let current_user = {}, isRegister = false, user_info_saved = localStorage.getItem('saved-user-login-info');
 if(user_info_saved) user_info_saved = JSON.parse(user_info_saved);
 
@@ -14,19 +15,6 @@ const {
     current_user = user;
     createInputDetailsPage();
 });
-
-function toggleDialog(force = null) {
-    if(!init) return false;
-
-    open_status = force === null ? !open_status : force;
-    if(open_status) {
-        account_container.style.display = 'block';
-    } else {
-        account_container.style.display = 'none';
-    }
-
-    return true;
-}
 
 function saveUserInfo(save_info = null) {
     if(!save_info) {
@@ -189,10 +177,13 @@ function submitDetails(evt) {
 }
 
 export default function createAccountPage() {
-    if(toggleDialog()) return;
+    if(init && toggleDialog) {
+        toggleDialog();
+        return;
+    }
 
-    account_container = document.getElementById('user-popup-container');
-    account_container.onclick = () => toggleDialog(false);
+    const [account_container, controller] = createDialog();
+    toggleDialog = controller.toggleModal;
 
     const account_main_page = document.createElement('form');
     account_main_page.className = 'account-main';
@@ -207,11 +198,12 @@ export default function createAccountPage() {
     
     account_main_page.appendChild(input_details_main);
     account_container.appendChild(account_main_page)
+    document.body.appendChild(account_container)
 
     createInputDetailsPage();
 
     init = true;
-    toggleDialog();
+    controller.showModal();
 }
 
 function createAccountInputFields({
