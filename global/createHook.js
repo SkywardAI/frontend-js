@@ -13,9 +13,13 @@ export default function createHook() {
     }
 
     function remount(key) {
-        return () => {
+        return value => {
             const need_unfreeze = updatesList[key].frozen
             updatesList[key].frozen = false;
+            if(need_unfreeze) {
+                const callback = updatesList[key].callback;
+                callback && callback(value);
+            }
             return need_unfreeze;
         }
     }
