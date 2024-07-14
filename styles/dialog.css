@@ -1,0 +1,22 @@
+.mock-dialog {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    display: none;
+    background-color: transparent;
+    z-index: 100;
+}
+
+.mock-dialog * {
+    pointer-events: initial;
+}
+
+.mock-dialog.show {
+    display: block;
+}
+
+.mock-dialog.show.modal {
+    background-color: rgba(0, 0, 0, 0.1);
+    pointer-events: initial;
+}

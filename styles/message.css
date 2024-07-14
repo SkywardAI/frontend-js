@@ -1,0 +1,67 @@
+.message-dialog {
+    position: fixed;
+    background-color: transparent;
+    border: none;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    outline: none;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
+}
+.message-dialog:focus-visible { outline: none !important; }
+
+.message-dialog * {
+    pointer-events: initial;
+}
+
+
+@keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slide-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+.message-dialog .message {
+    position: relative;
+    margin-right: 5px;
+    margin-left: auto;
+    width: fit-content;
+    height: fit-content;
+    min-width: 300px;
+    min-height: 50px;
+    padding: 10px 15px;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    animation: slide-in forwards;
+    margin-top: 5px;
+    background-color: white;
+    border: 1px solid;
+    color: dodgerblue;
+    background-color: rgb(245, 250, 255);
+}
+
+.message.err,.message.error { color: red; background-color: rgb(255, 244, 244); }
+.message.warn,.message.warning { color: goldenrod; background-color: rgb(255, 254, 240); }
+.message.success { color: limegreen; background-color: rgb(240, 253, 240); }
+
+.message-dialog .message .message-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 20px;
+    color: inherit;
+}
+
+.message-dialog .message .message-text {
+    font-size: 17px;
+    padding: 5px 0px;
+    color: black;
+}

@@ -25,7 +25,7 @@ export default function useHistory(updated = null) {
     async function requestUpdateHistory() {
         if(!currentSession) return;
         
-        const chat_history = await (await request('chat')).json();
+        const chat_history = await request('chat');
 
         history.length = 0;
         chat_history.forEach(({sessionUuid, name, createdAt}) => {

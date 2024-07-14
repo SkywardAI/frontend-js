@@ -2,6 +2,7 @@ import useConversation from "../../global/useConversation.js";
 import useHistory from "../../global/useHistory.js";
 import useModelSettings from "../../global/useModelSettings.js";
 import { formatJSON } from "../../tools/conversationFormat.js";
+import showMessage from "../../tools/message.js";
 import request from "../../tools/request.js";
 import getSVG from "../../tools/svgs.js";
 
@@ -20,7 +21,16 @@ const {
     submit_icon && submit_icon.classList.toggle('pending', conversation.pending)
     if(c.id === conversation.id) return;
     conversation = c;
-    if(!conversation.id) return;
+    if(!conversation.id) {
+        if(main_elem) {
+            main_elem.innerHTML = `
+            <div class='greeting'>
+                Please select a ticket or start a new conversation on left.
+            </div>`
+            document.getElementById('submit-chat').innerHTML = '';
+        }
+        return;
+    }
 
     updateConversation();
     buildForm();
@@ -66,8 +76,7 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
         </div>
     </div>`)
 
-    if(!toggle_expand) toggle_expand = toggleExpand;
-
+    toggle_expand = toggleExpand;
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
     document.getElementById('toggle-sidebar-expand').onclick = toggle_expand;
@@ -77,8 +86,8 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
             formatJSON(conversation, getHistory(conversation.id))
         }
     }
-
     modelSettingsRemount();
+
     if(conversationReMount() && conversation.id) {
         updateConversation();
         buildForm();
@@ -114,7 +123,13 @@ function buildForm() {
 
 function submitContent(evt) {
     evt.preventDefault();
-    if(conversation.pending) return;
+    if(conversation.pending) {
+        showMessage(
+            "Please wait until assistant finished response.",
+            { type: 'warn' }
+        )
+        return;
+    }
 
     const content = evt.target['send-content'].value;
     content && (
@@ -129,14 +144,16 @@ async function sendMessage(message, send) {
     togglePending();
     if(!conversation.history.length) {
         main_elem.innerHTML = ''
-        updateHistoryName(conversation.id, message.substring(0, 20))
+        const message_len = message.length;
+        updateHistoryName(conversation.id, 
+        `${message.substring(0, 25)}${message_len > 25 ? '...' : ''}`)
     }
-    main_elem.appendChild(createBlock('out', message)[0]);
+    main_elem.appendChild(createBlock('user', message)[0]);
     main_elem.scrollTo({
         top: main_elem.scrollHeight, 
         behavior: 'smooth'
     })
-    const [bot_answer, updateMessage] = createBlock('in');
+    const [bot_answer, updateMessage] = createBlock('assistant');
     main_elem.appendChild(bot_answer);
 
     const response = await request('chat', {
@@ -145,14 +162,14 @@ async function sendMessage(message, send) {
             sessionUuid: conversation.id || "uuid", 
             message, ...model_settings
         }
-    })
+    }, true)
 
     const content = await send(response, updateMessage);
     togglePending();
 
     appendConversationMessage([
-        { type: 'out', message },
-        { type: 'in', message: content}
+        { role: 'user', message },
+        { role: 'assistant', message: content}
     ], conversation.id)
 }
 
@@ -198,21 +215,25 @@ function updateConversation() {
     }
 
     main_elem.innerHTML = ''
-    conversation.history.forEach(({type, message})=>{
-        main_elem.appendChild(createBlock(type, message)[0])
+    conversation.history.forEach(({role, message})=>{
+        main_elem.appendChild(createBlock(role, message)[0])
+    })
+    main_elem.scrollTo({
+        top: main_elem.scrollHeight, 
+        behavior: 'smooth'
     })
 }
 
-function createBlock(type, msg = '') {
+function createBlock(role, msg = '') {
     const block = document.createElement('div');
-    block.className = `conversation-block sender-${type}`;
+    block.className = `conversation-block sender-${role}`;
 
     const message = document.createElement('div');
     message.className = 'message';
 
     block.appendChild(message);
 
-    if(type === 'in') {
+    if(role === 'assistant') {
         message.innerHTML = `
         ${getSVG('circle-fill', 'dot-animation dot-1')}
         ${getSVG('circle-fill', 'dot-animation dot-2')}

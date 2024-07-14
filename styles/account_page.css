@@ -1,7 +1,168 @@
-#user-avatar svg {
-    width: 110%;
-    height: 110%;
-    left: -5%;
-    bottom: -5%;
+#user-popup-container {
+    content: '';
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    display: none;
+}
+
+.account-main {
+    --img-width: 60%;
+    --details-width: calc(100% - var(--img-width));
+
+    width: 70vw;
+    height: 80vh;
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    left: 15vw;
+    top: 10vh;
+    background-color: white;
+    border-radius: 15px;
+    overflow-x: hidden;
+}
+
+.account-main .logo-image {
+    position: absolute;
+    width: var(--img-width);
+    height: 100%;
+    left: 0;
+    top: 0;
+    align-items: center;
+    display: flex;
+}
+
+.account-main .logo-image img {
+    margin: auto;
+}
+
+.account-main .input-details-main {
+    --item-width: 250px;
+    --item-height: 45px;
+
+    position: absolute;
+    width: var(--item-width);
+    height: calc(100% - 40px);
+    top: 0;
+    left: var(--img-width);
+    align-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 20px;
+    margin-right: unset;
+    padding-right: 20px;
+}
+
+.input-details-main .account-field-container {
+    width: 100%;
+    height: var(--item-height);
     position: relative;
+    margin-bottom: 15px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+.input-details-main .account-field-container:hover {
+    cursor: text;
+}
+
+.input-details-main .account-field-container:has(input:focus) {
+    border-color: dodgerblue;
+}
+
+.input-details-main .account-field-container .title {
+    position: absolute;
+    color: gray;
+    font-size: 18px;
+    width: 100%;
+    height: 100%;
+    line-height: var(--item-height);
+    left: 10px;
+    top: 0px;
+    transition-duration: .5s;
+    transform-origin: top left;
+    user-select: none;
+}
+
+.input-details-main .account-field-container:has(input:focus) .title,
+.input-details-main .account-field-container:has(input:not(:placeholder-shown)) .title
+ {
+    transform: scale(0.6);
+}
+.input-details-main .account-field-container:has(input:focus) .title {
+    color: dodgerblue;
+}
+
+.input-details-main .account-field-container input {
+    width: 100%;
+    height: 40%;
+    border: none;
+    box-sizing: border-box;
+    padding: 0px 15px;
+    font-size: 16px;
+    position: absolute;
+    max-width: 100%;
+    bottom: 5px;
+    background-color: transparent;
+}
+.input-details-main .account-field-container input:focus {
+    outline: none;
+}
+
+.password-eye-icon {
+    position: absolute;
+    height: var(--item-height);
+    width: var(--item-height);
+    display: flex;
+    align-items: center;
+    right: 0;
+}
+.password-eye-icon svg { margin: auto; }
+
+.input-details-main .keep-login {
+    display: flex;
+    height: fit-content;
+    width: fit-content;
+    align-items: center;
+    margin: auto;
+}
+.input-details-main .keep-login * { margin: auto; }
+.input-details-main .keep-login input[type='checkbox']{
+    width: 17px;
+    height: 17px;
+    margin-right: 10px;
+}
+
+.input-details-main hr {
+    width: var(--item-width);
+    position: relative;
+    margin: auto;
+    margin-left: 0;
+    margin-top: 20px;
+    max-width: 100%;
+}
+
+.input-details-main .function-btn {
+    width: var(--item-width);
+    height: calc(var(--item-height) - 3px);
+    border-radius: 16px;
+    background-color: dodgerblue;
+    color: white;
+    box-sizing: border-box;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 17px;
+    display: block;
+    position: relative;
+    max-width: 100%;
+}
+
+.input-details-main .function-btn.reverse-color {
+    background-color: white;
+    border: 1px solid dodgerblue;
+    color: dodgerblue;
 }

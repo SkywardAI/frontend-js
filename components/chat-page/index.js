@@ -1,6 +1,10 @@
+import createDialog from "../../tools/dialog.js";
 import createChatMain from "./chatMain.js";
 import createChatHistory from "./history.js";
 import createModelSettings from "./modelSettings.js";
+
+const [settings_main, { toggleModal }] = createDialog();
+document.body.appendChild(settings_main)
 
 export default function createChatPage() {
     const chatPage = document.createElement('div');
@@ -12,16 +16,11 @@ export default function createChatPage() {
         chatPage.classList.toggle('sidebar-expanded');
     }
 
-    let model_setting_elem;
-    function openModelSetting() {
-        model_setting_elem && model_setting_elem.showModal();
-    }
-
     const dismount_components = []
 
     dismount_components.push(createChatHistory(chatPage));
-    dismount_components.push(createChatMain(chatPage, toggleExpand, openModelSetting));
-    dismount_components.push(createModelSettings(chatPage, elem=>model_setting_elem = elem));
+    dismount_components.push(createChatMain(chatPage, toggleExpand, toggleModal));
+    dismount_components.push(createModelSettings(settings_main));
 
     return () => {
         dismount_components.forEach(e=>e());

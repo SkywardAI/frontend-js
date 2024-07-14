@@ -1,7 +1,7 @@
 import useModelSettings from "../../global/useModelSettings.js";
 import settingSection from "./settingSection.js";
 
-let settings = {};
+let settings = {}, init = false;
 
 const { 
     componentReMount, componetDismount, 
@@ -15,37 +15,35 @@ const fields = {
     n_predict: { title: 'N-Predict', valueRange: { min: 128, max: 512 } }
 }
 
-export default function createModelSettings(main, passDialogElem) {
+export default function createModelSettings(main) {
     componentReMount();
 
-    const popup = document.createElement('dialog');
-    popup.onclick = () => popup.close();
-    main.insertAdjacentElement("beforeend", popup)
-    passDialogElem(popup)
-
-    const model_settings = document.createElement('div');
-    model_settings.className = 'model-settings';
-    model_settings.onclick = event => event.stopPropagation();
-
-    model_settings.insertAdjacentHTML('afterbegin', `
-        <div class='title'>Adjust Model Settings</div>
-        <div class='sub-title'>Settings will be saved automatically</div>
-    `)
-
-    for(const key in fields) {
-        const { title, valueRange } = fields[key];
-        const [component, setter] = settingSection(
-            title, valueRange,
-            () => { setToDefault(key) && loadSettings() },
-            value=>updateModelSettings(key, value)
-        )
-        model_settings.appendChild(component);
-        fields[key].setValue = setter;
+    if(!init) {
+        const model_settings = document.createElement('div');
+        model_settings.className = 'model-settings';
+        model_settings.onclick = event => event.stopPropagation();
+    
+        model_settings.insertAdjacentHTML('afterbegin', `
+            <div class='title'>Adjust Model Settings</div>
+            <div class='sub-title'>Settings will be saved automatically</div>
+        `)
+    
+        for(const key in fields) {
+            const { title, valueRange } = fields[key];
+            const [component, setter] = settingSection(
+                title, valueRange,
+                () => { setToDefault(key) && loadSettings() },
+                value=>updateModelSettings(key, value)
+            )
+            model_settings.appendChild(component);
+            fields[key].setValue = setter;
+        }
+    
+        main.appendChild(model_settings);
+        loadSettings();
+        init = true;
     }
 
-    popup.appendChild(model_settings);
-
-    loadSettings();
     return componetDismount;
 }
 
