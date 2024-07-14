@@ -70,7 +70,7 @@ async function selectConversation(id) {
         storeHistory();
         history = conversation_histories[id];
     }
-    currentConversation = { id, history };
+    currentConversation = { id, history, pending: false };
     updateAll(currentConversation);
 }
 
