@@ -64,4 +64,6 @@
     font-size: 17px;
     padding: 5px 0px;
     color: black;
+    max-width: 300px;
+    word-wrap: break-word;
 }
