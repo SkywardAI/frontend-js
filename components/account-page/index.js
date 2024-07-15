@@ -3,6 +3,7 @@ import capitalizeFirstLetter from "../../tools/capitalizeFirstLetter.js";
 import getSVG from "../../tools/svgs.js";
 import showMessage from "../../tools/message.js";
 import createDialog from '../../tools/dialog.js';
+import { email_not_valid, password_not_valid, username_not_valid, validateEmail, validatePassword, validateUsername } from '../../tools/validators.js';
 
 let input_details_main = null, init = false, toggleDialog;
 let current_user = {}, isRegister = false, user_info_saved = localStorage.getItem('saved-user-login-info');
@@ -127,11 +128,18 @@ function submitDetails(evt) {
         const repeat_new_password = evt.target['repeat-new-password'].value;
         const submit_values = {}
         if(email && email !== current_user.email) {
+            if(!validateEmail(email)) {
+                showMessage(email_not_valid, { type: "error" })
+                return;
+            }
             submit_values.email = email;
         }
         if(new_password) {
-            if(repeat_new_password !== new_password) {
-            showMessage("Passwords are not same!", { type: 'err' })
+            if(!validatePassword(new_password)) {
+                showMessage(password_not_valid, { type: 'err' })
+                return;
+            } else if(repeat_new_password !== new_password) {
+                showMessage("Passwords are not same!", { type: 'err' })
                 return;
             }
             submit_values.password = new_password;
@@ -152,6 +160,17 @@ function submitDetails(evt) {
         const keep_login = evt.target['keep-login'].checked;
         if(isRegister) {
             const email = evt.target.email.value;
+            if(!validateUsername(username)) {
+                showMessage(username_not_valid, { type: 'err' })
+                return;
+            } else if(!validateEmail(email)) {
+                showMessage(email_not_valid, { type: 'err' })
+                return;
+            } else if(!validatePassword(password)) {
+                showMessage(password_not_valid, { type: 'err' })
+                return;
+            }
+            
             const repeat_password = evt.target['repeat-password'].value;
     
             if(password !== repeat_password) {
