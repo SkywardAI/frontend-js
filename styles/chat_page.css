@@ -316,7 +316,7 @@
 =====================================================
 */
 
-.model-settings {
+.chat-settings {
     --model-setting-width: 400px;
     --model-setting-height: 500px;
 
@@ -331,74 +331,103 @@
     border-radius: 10px;
 }
 
-.model-settings .title {
+.chat-settings .session-settings.disabled {
+    display: none;
+}
+
+.chat-settings .title {
     margin: 10px 20px;
     font-size: 25px;
     font-weight: bolder;
     text-align: center;
 }
 
-.model-settings .sub-title {
+.chat-settings .sub-title {
     text-align: center;
     font-size: 13px;
     color: gray;
     margin-bottom: 7px;
 }
 
-.model-settings .setting-section {
+.chat-settings .setting-section {
+    --input-height: 40px;
+
     width: 100%;
     padding: 15px 20px;
+    box-sizing: border-box;
+    display: block;
 }
 
-.model-settings .setting-section .title {
+.chat-settings .setting-section .title {
     margin: unset;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
     font-size: 17px;
     font-weight: unset;
     text-align: left;
 }
 
-.model-settings .setting-section input[type="text"] {
-    height: 40px;
+.chat-settings .setting-section input[type="text"] {
+    height: var(--input-height);
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 0px 10px;
     border: 1px solid gray;
-    width: 50%;
+    width: 100%;
 }
-.model-settings .setting-section input[type="text"]:focus {
+.chat-settings .setting-section input[type="text"]:focus {
     outline: none;
     border-width: 2px;
 }
 
-.model-settings .setting-section .combined-section {
+.chat-settings .setting-section .input-with-confirm {
+    position: relative;
+}
+
+.chat-settings .setting-section .input-with-confirm .confirm-input {
+    height: var(--input-height);
+    width: var(--input-height);
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    color: dodgerblue;
+}
+.chat-settings .setting-section .input-with-confirm .confirm-input svg {
+    margin: auto;
+    width: 50%;
+    height: 50%;
+}
+
+.chat-settings .setting-section .combined-section {
     --item-margin: 10px;
     display: flex;
     align-items: center;
 }
-.model-settings .setting-section .combined-section * { margin: auto; margin-right: var(--item-margin); }
-.model-settings .setting-section .combined-section *:last-child { margin-right: unset; }
+.chat-settings .setting-section .combined-section * { margin: auto; margin-right: var(--item-margin); }
+.chat-settings .setting-section .combined-section *:last-child { margin-right: unset; }
 
-.model-settings .setting-section .combined-section.range {
+.chat-settings .setting-section .combined-section.range {
     width: 100%;
     --restore-default-icon-size: 20px;
     --range-input-width: calc(75% - var(--restore-default-icon-size));
     --text-input-width: 25%;
 }
 
-.model-settings .setting-section .combined-section.range input[type="range"] {
+.chat-settings .setting-section .combined-section.range input[type="range"] {
     width: var(--range-input-width);
 }
-.model-settings .setting-section .combined-section.range input[type="text"] {
+.chat-settings .setting-section .combined-section.range input[type="text"] {
     width: var(--text-input-width);
+    border-radius: 10px;
     text-align: center;
 }
-.model-settings .setting-section .combined-section.range .restore-default-icon {
+.chat-settings .setting-section .combined-section.range .restore-default-icon {
     width: var(--restore-default-icon-size);
     height: var(--restore-default-icon-size);
     color: dodgerblue;
 }
-.model-settings .setting-section .combined-section.range .restore-default-icon svg {
+.chat-settings .setting-section .combined-section.range .restore-default-icon svg {
     width: 100%;
     height: 100%;
 }
