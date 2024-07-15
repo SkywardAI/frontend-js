@@ -64,7 +64,7 @@ function updateHistoryList() {
         <div class='datetime'>${createdAt}</div>`
 
         ticket.onclick = () => {
-            selectConversation(id);
+            selectConversation(id, name);
         }
 
         tickets_list.appendChild(ticket)

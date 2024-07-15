@@ -15,7 +15,7 @@ let abort_controller;
 const { 
     componetDismount: conversationDismount, 
     componentReMount: conversationReMount, 
-    togglePending,
+    togglePending, rename,
     sendMessage:appendConversationMessage 
 } = useConversation(c=>{
     conversation.pending = c.pending;
@@ -45,7 +45,7 @@ const {
     model_settings = s;
 })
 
-const { getHistory, updateHistoryName } = useHistory();
+const { getHistory } = useHistory();
 
 export default function createChatMain(main, toggleExpand, openModelSetting) {
     main.insertAdjacentHTML('beforeend', `
@@ -161,8 +161,7 @@ async function sendMessage(message, send) {
     if(!conversation.history.length) {
         main_elem.innerHTML = ''
         const message_len = message.length;
-        updateHistoryName(conversation.id, 
-        `${message.substring(0, 25)}${message_len > 25 ? '...' : ''}`)
+        await rename(`${message.substring(0, 25)}${message_len > 25 ? '...' : ''}`)
     }
     main_elem.appendChild(createBlock('user', message)[0]);
     main_elem.scrollTo({

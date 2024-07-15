@@ -27,14 +27,15 @@ function addHistory(new_ticket) {
     updateAll(history);
 }
 
-function updateHistoryName(id, name) {
-    for(const index in history) {
-        if(history[index].id === id) {
-            history[index].name = name;
-            // TODO: tell backend
-        }
-    }
-    updateAll(history);
+async function updateHistoryName(id, name) {
+    history[history.findIndex(h=>h.id === id)].name = name;
+    const { http_error } = await request('chat/session', {
+        method: 'PATCH',
+        body: { sessionUuid: id, name }
+    })
+    const success = !http_error;
+    if(success) updateAll(history);
+    return success;
 }
 
 function getHistory(id) {
@@ -45,11 +46,6 @@ useSessionId(id=>{
     requestUpdateHistory();
 })
 
-/**
- * Hook for sync history
- * @param {Function} updated callback function when history updated
- * @returns {Object} List of history operators
- */
 export default function useHistory(updated = null) {
     const mount_key = onmount(updated)
 
