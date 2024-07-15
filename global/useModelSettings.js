@@ -24,31 +24,35 @@ const writeSettingsToLocal = debounce(()=>{
 
 const { onmount, remount, dismount, updateAll } = createHook();
 
+function updateSettings(key, value) {
+    currentSettings = {
+        ...currentSettings,
+        [key]: value
+    }
+    updateAll(currentSettings);
+    writeSettingsToLocal();
+}
+
+function setToDefault(key) {
+    if(key in defaultSettings) {
+        updateSettings(key, defaultSettings[key])
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export default function useModelSettings(updated) {
     const mount_key = onmount(updated)
 
-    function updateSettings(key, value) {
-        currentSettings = {
-            ...currentSettings,
-            [key]: value
-        }
-        updateAll(currentSettings);
-        writeSettingsToLocal();
+    function componentReMount() {
+        return remount(mount_key)(currentSettings)
     }
 
-    function setToDefault(key) {
-        if(key in defaultSettings) {
-            updateSettings(key, defaultSettings[key])
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    updated(currentSettings);
+    updated && updated(currentSettings);
 
     return {
         updateSettings, setToDefault,
-        componetDismount: dismount(mount_key), componentReMount:remount(mount_key) 
+        componetDismount: dismount(mount_key), componentReMount
     }
 }

@@ -1,8 +1,7 @@
 function writeObjToCookie(cookie_items) {
-    document.cookie = 
-    Object.entries(cookie_items).map(([key, value])=>{
-        return `${key}=${value}`
-    }).join('; ');
+    Object.entries(cookie_items).forEach(([key, value])=>{
+        document.cookie=`${key}=${value}`;
+    });
 }
 
 function loadObjFromCookie() {
@@ -15,8 +14,9 @@ function loadObjFromCookie() {
     return cookie_items;
 }
 
+const cookie_items = loadObjFromCookie();
+
 export default function cookies() {
-    const cookie_items = loadObjFromCookie();
 
     function getItem(key) {
         return cookie_items[key];
@@ -43,8 +43,8 @@ export default function cookies() {
 
     function removeItem(key) {
         const value = cookie_items[key];
-        delete cookie_items[key];
-        writeObjToCookie(cookie_items);
+        document.cookie=`${key}=`
+        delete cookie_items[key]
         return value;
     }
 

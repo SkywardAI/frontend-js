@@ -1,6 +1,6 @@
 import getSVG from "../../tools/svgs.js";
 
-export default function settingSection(title, valueRange, setToDefault, updateSetting) {
+export default function rangeSettingSection(title, valueRange, setToDefault, updateSetting) {
 
     const { max, min, from_range, to_range } = rangeValueConverter(valueRange)
 
