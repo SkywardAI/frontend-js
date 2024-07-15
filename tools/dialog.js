@@ -12,6 +12,7 @@ document.addEventListener("keydown", closeDialogListener)
 export default function createDialog(modal_close_on_click = true) {
     const dialog = document.createElement('div');
     dialog.className = 'mock-dialog';
+    document.body.appendChild(dialog);
 
     let open_status = false, opened_idx = -1;
 
