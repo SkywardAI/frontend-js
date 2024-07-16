@@ -1,7 +1,7 @@
 import useConversation from "../../global/useConversation.js";
 import useHistory from "../../global/useHistory.js";
 import useModelSettings from "../../global/useModelSettings.js";
-import { formatJSON } from "../../tools/conversationFormat.js";
+import { formatJSON, formatMarkdown } from "../../tools/conversationFormat.js";
 import showMessage from "../../tools/message.js";
 import request from "../../tools/request.js";
 import getSVG from "../../tools/svgs.js";
@@ -168,7 +168,7 @@ async function sendMessage(message, send) {
         top: main_elem.scrollHeight, 
         behavior: 'smooth'
     })
-    const [bot_answer, updateMessage] = createBlock('assistant');
+    const [bot_answer, elements] = createBlock('assistant');
     main_elem.appendChild(bot_answer);
 
     let content = ''
@@ -183,15 +183,12 @@ async function sendMessage(message, send) {
             }
         }, true)
     
-        await send(response, msg=>{
-            content = msg;
-            updateMessage(msg);
-        });
+        await send(response, elements, c=>content = c);
     } catch(error) {
         error;
         if(content) content+=' ...'
         content += '(Message Abroted)'
-        updateMessage(content)
+        elements.main = content;
     } finally {
         appendConversationMessage([
             { role: 'user', message },
@@ -210,28 +207,43 @@ function sendMessageWaiting(msg) {
 }
 
 async function sendMessageStream(msg) {
-    return sendMessage(msg, async (response, updateMessage) => {
-        let resp_content = ''
+    return sendMessage(msg, async (response, elements, updateContent) => {
+        const { main, pending, started } = elements;
+        let msg_started = false;
         const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-        let pending_content = ''
+        let resp_content = '', pending_content = '', html_content = '', end_block = null
         while(true) {
             const {value, done} = await reader.read();
             if(done) break;
             pending_content += value;
-            if(pending_content.includes('\n\n')) {
-                const splitted_content = pending_content.split('\n\n')
+            if(pending_content.includes('}\n\n')) {
+                const splitted_content = pending_content.split('}\n\n')
                 try {
-                    const json = JSON.parse(splitted_content.shift().replace('data: ', ''))
+                    if(!msg_started) {
+                        msg_started = true;
+                        started();
+                    }
+                    const json = JSON.parse(splitted_content.shift().replace('data: ', '')+'}')
+                    pending_content = splitted_content.join('}\n\n')
                     resp_content += json.content;
-                    updateMessage(resp_content);
-                    pending_content = splitted_content.join('')
+                    html_content += json.content;
+                    const parsed_md = formatMarkdown(html_content, main, pending, end_block);
+                    main_elem.scrollTo({
+                        top: main_elem.scrollHeight, 
+                        behavior: 'smooth'
+                    })
+                    if(parsed_md) {
+                        html_content = parsed_md[0];
+                        end_block = parsed_md[1];
+                    }
+                    updateContent(resp_content);
                     if(json.stop) break;
-                } catch(error) {
+                } catch(error) { 
                     console.error(error);
                 }
             }
         }
-        return resp_content;
+        formatMarkdown(html_content, main, pending, end_block, true);
     })
 }
 
@@ -262,28 +274,28 @@ function createBlock(role, msg = '') {
     block.appendChild(message);
 
     if(role === 'assistant') {
-        message.innerHTML = `
-        ${getSVG('circle-fill', 'dot-animation dot-1')}
-        ${getSVG('circle-fill', 'dot-animation dot-2')}
-        ${getSVG('circle-fill', 'dot-animation dot-3')}`
-
         block.insertAdjacentHTML("afterbegin", `<img class='avatar' src='/medias/SkywardAI.png'>`)
+        if(!msg) {
+            message.innerHTML = `
+            ${getSVG('circle-fill', 'dot-animation dot-1')}
+            ${getSVG('circle-fill', 'dot-animation dot-2')}
+            ${getSVG('circle-fill', 'dot-animation dot-3')}`
+        }
     }
 
+    const pending_elem = document.createElement('div');
+
     if(msg) {
-        message.textContent = msg;
+        message.appendChild(pending_elem);
+        formatMarkdown(msg, message, pending_elem, null, true);
     }
 
     return [
         block,
-        (msg) => {
-            if(msg) {
-                message.textContent = msg;
-                main_elem.scrollTo({
-                    top: main_elem.scrollHeight, 
-                    behavior: 'smooth'
-                })
-            }
+        {
+            main: message,
+            pending: pending_elem,
+            started: ()=>{ message.innerHTML = ''; message.appendChild(pending_elem); }
         }
     ]
 }
