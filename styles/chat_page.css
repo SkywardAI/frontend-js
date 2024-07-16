@@ -247,6 +247,20 @@
     animation-delay: .6s;
 }
 
+.message .code-block {
+    background-color: #1f1f1f;
+    color: white;
+    padding: 20px 15px;
+    border-radius: 7px;
+    margin-top: 5px;
+}
+
+.message .inline-code {
+    background-color: var(--gray-bg);
+    padding: 3px 7px;
+    border-radius: 6px;
+}
+
 #chat-page #chat-main #submit-chat {
     position: absolute;
     width: calc(100% - var(--conversation-main-side-padding));
