@@ -5,6 +5,7 @@ import { formatJSON, formatMarkdown } from "../../tools/conversationFormat.js";
 import showMessage from "../../tools/message.js";
 import request from "../../tools/request.js";
 import getSVG from "../../tools/svgs.js";
+import createRAGSelector from "./rag-blocks.js";
 
 let conversation = {pending: false}, model_settings = {}, 
     main_elem, toggle_expand,
@@ -251,70 +252,11 @@ async function sendMessageStream(msg) {
     })
 }
 
-const rag_modes = [
-    { mode: 'on' },
-    { mode: 'off' },
-    { mode: 'hybrid', disabled: true },
-]
-
-async function updateRAG(mode, element) {
-    if(mode === 'on') {
-        const { http_error } = await request('chat/session', {
-            method: 'PATCH',
-            body: {
-                sessionUuid: conversation.id,
-                type: 'rag'
-            }
-        })
-        if(http_error) {
-            showMessage("Set RAG mode failed!", { type: 'err' });
-            return;
-        }
-    }
-    showMessage(`This session will start with rag ${mode}`);
-    element.classList.add('completed');
-    await new Promise(s=>setTimeout(s, 1000));
-    element.insertAdjacentHTML(
-        "beforebegin", 
-        `<div class='greeting rag-info'>RAG <strong>${mode.toUpperCase()}</strong></div>`
-    )
-    element.remove();
-}
-
-function createRAGSwitch() {
-    const rag_select = document.createElement('div');
-    rag_select.className = 'rag-select';
-
-    rag_modes.forEach(({mode, disabled})=>{
-        const option = document.createElement('div');
-        option.className = 'option';
-        if(disabled) {
-            option.classList.add('disabled');
-        } else {
-            option.classList.add('clickable')
-            option.onclick = () => {
-                updateRAG(mode, rag_select)
-            };
-        }
-        option.innerHTML = `Start session with RAG <strong>${mode}</strong>`;
-        rag_select.appendChild(option);
-    })
-    return rag_select;
-}
-
 function updateConversation() {
     if(!conversation.history) return;
     if(!conversation.history.length && main_elem) {
         main_elem.innerHTML = "<div class='greeting start-session'>Hi, how can I help you today?</div>"
-        if(!conversation.type) {
-            main_elem.appendChild(createRAGSwitch());
-        } else {
-            main_elem.insertAdjacentHTML("beforeend", 
-            `<div class='greeting rag-info'>RAG <strong>${
-                conversation.type === 'rag' ? 'ON' :
-                conversation.type === 'chat' ? 'OFF' : ''
-            }</strong></div>`)
-        }
+        main_elem.appendChild(createRAGSelector(conversation))
         return;
     }
 
