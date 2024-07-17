@@ -247,10 +247,43 @@ async function sendMessageStream(msg) {
     })
 }
 
+function createRAGSwitch() {
+    const confirm_rag = document.createElement('div');
+    confirm_rag.className = 'greeting confirm-rag';
+    confirm_rag.innerHTML = '<div class="confirm-text">Start this session with RAG?</div>'
+
+    const rag_options = document.createElement('select');
+    rag_options.className = "confirm-container"
+    rag_options.innerHTML = `
+    <option value='on'>ON</option>
+    <option value='off' selected>OFF</option>
+    <option value='hybrid' disabled>HYBRID</option>
+    `
+
+    rag_options.onchange = async () => {
+        if(rag_options.value === 'on') {
+            // if user don't got svg file
+            const { http_error } = await request('chat/session', {
+                method: 'PATCH',
+                body: {
+                    sessionUuid: conversation.id,
+                    type: 'rag'
+                }
+            })
+            !http_error && showMessage("Updated Session to RAG ON")
+        }
+    }
+    
+    // confirm_container.appendChild(checkbox);
+    confirm_rag.firstElementChild.after(rag_options);
+    return confirm_rag;
+}
+
 function updateConversation() {
     if(!conversation.history) return;
     if(!conversation.history.length && main_elem) {
-        main_elem.innerHTML = "<div class='greeting'>Hi, how can I help you today?</div>"
+        main_elem.innerHTML = "<div class='greeting start-session'>Hi, how can I help you today?</div><hr>"
+        main_elem.appendChild(createRAGSwitch());
         return;
     }
 
