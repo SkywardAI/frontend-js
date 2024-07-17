@@ -247,42 +247,61 @@ async function sendMessageStream(msg) {
     })
 }
 
-function createRAGSwitch() {
-    const confirm_rag = document.createElement('div');
-    confirm_rag.className = 'greeting confirm-rag';
-    confirm_rag.innerHTML = '<div class="confirm-text">Start this session with RAG?</div>'
+const rag_modes = [
+    { mode: 'on' },
+    { mode: 'off' },
+    { mode: 'hybrid', disabled: true },
+]
 
-    const rag_options = document.createElement('select');
-    rag_options.className = "confirm-container"
-    rag_options.innerHTML = `
-    <option value='on'>ON</option>
-    <option value='off' selected>OFF</option>
-    <option value='hybrid' disabled>HYBRID</option>
-    `
-
-    rag_options.onchange = async () => {
-        if(rag_options.value === 'on') {
-            // if user don't got svg file
-            const { http_error } = await request('chat/session', {
-                method: 'PATCH',
-                body: {
-                    sessionUuid: conversation.id,
-                    type: 'rag'
-                }
-            })
-            !http_error && showMessage("Updated Session to RAG ON")
+async function updateRAG(mode, element) {
+    if(mode === 'on') {
+        const { http_error } = await request('chat/session', {
+            method: 'PATCH',
+            body: {
+                sessionUuid: conversation.id,
+                type: 'rag'
+            }
+        })
+        if(http_error) {
+            showMessage("Set RAG mode failed!", { type: 'err' });
+            return;
         }
     }
-    
-    // confirm_container.appendChild(checkbox);
-    confirm_rag.firstElementChild.after(rag_options);
-    return confirm_rag;
+    showMessage(`This session will start with rag ${mode}`);
+    element.classList.add('completed');
+    await new Promise(s=>setTimeout(s, 1000));
+    element.insertAdjacentHTML(
+        "beforebegin", 
+        `<div class='greeting rag-info'>RAG <strong>${mode.toUpperCase()}</strong></div>`
+    )
+    element.remove();
+}
+
+function createRAGSwitch() {
+    const rag_select = document.createElement('div');
+    rag_select.className = 'rag-select';
+
+    rag_modes.forEach(({mode, disabled})=>{
+        const option = document.createElement('div');
+        option.className = 'option';
+        if(disabled) {
+            option.classList.add('disabled');
+        } else {
+            option.classList.add('clickable')
+            option.onclick = () => {
+                updateRAG(mode, rag_select)
+            };
+        }
+        option.innerHTML = `Start session with RAG <strong>${mode}</strong>`;
+        rag_select.appendChild(option);
+    })
+    return rag_select;
 }
 
 function updateConversation() {
     if(!conversation.history) return;
     if(!conversation.history.length && main_elem) {
-        main_elem.innerHTML = "<div class='greeting start-session'>Hi, how can I help you today?</div><hr>"
+        main_elem.innerHTML = "<div class='greeting start-session'>Hi, how can I help you today?</div>"
         main_elem.appendChild(createRAGSwitch());
         return;
     }

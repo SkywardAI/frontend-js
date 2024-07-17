@@ -188,33 +188,61 @@
     font-size: 30px;
 }
 
-#conversation-main .greeting.start-session+hr {
-    margin: 20px 0px;
+@keyframes rag-info-show {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
 }
 
-#conversation-main .greeting.confirm-rag {
-    font-size: 24px;
-    margin-top: 10px;
+#conversation-main .greeting.rag-info {
+    font-size: 25px;
+    margin-top: 20px;
+    animation: rag-info-show .5s forwards;
+}
+
+#conversation-main .rag-select {
+    --option-width: 160px;
+    --option-height: 100px;
+
     display: flex;
-    align-items: center;
-}
-
-#conversation-main .greeting.confirm-rag .confirm-text {
-    margin: 0px 10px;
-}
-
-#conversation-main .greeting.confirm-rag .confirm-container {
-    width: fit-content;
+    width: 100%;
     height: fit-content;
-    position: relative;
-    background: transparent;
-    border: none;
-    font-size: 20px;
-    border-bottom: 1px solid;
-    text-align: center;
+    align-items: center;
+    margin: auto;
+    margin-top: 40px;
+    transition-duration: 1s;
+    transform-origin: top;
 }
-#conversation-main .greeting.confirm-rag .confirm-container:focus {
-    outline: none;
+
+#conversation-main .rag-select.completed {
+    transform: scale(0) translateY(100%);
+}
+
+#conversation-main .rag-select .option {
+    width: 160px;
+    height: 100px;
+    text-align: left;
+    border: 1px solid lightgray;
+    padding: 20px;
+    transition-duration: .3s;
+    border-radius: 15px;
+    margin: 0px 15px;
+    color: gray;
+}
+
+#conversation-main .rag-select .option:first-child {
+    margin-left: auto;
+}
+#conversation-main .rag-select .option:last-child {
+    margin-right: auto;
+}
+
+#conversation-main .rag-select .option.disabled {
+    background-color: lightgray;
+    border-color: gray;
+}
+
+#conversation-main .rag-select .option:not(.disabled):hover {
+    background-color: var(--transparent-gray-bg);
 }
 
 #conversation-main .conversation-block {
