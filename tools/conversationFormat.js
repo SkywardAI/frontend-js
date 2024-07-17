@@ -82,13 +82,18 @@ export function formatJSON(conversation, {createdAt, name}) {
         "title": "${name}",
         "history": [
             ${conversation.history.map(({role, message})=>{
-                return `{ "role": "${role}", "message": "${message.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll("\n", "\\n")}" }`
+                const msg_str = message.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll("\n", "\\n")
+                return `{ "role": "${role}", "message": "${msg_str}" }`
             }).join(`,\n${" ".repeat(12)}`)}
         ]
     }
 }`
+
+    const json_file = new Blob([json], {type: 'text/plain'});
+    const url = URL.createObjectURL(json_file);
     const download_link = document.createElement('a')
-    download_link.href=`data:text/plain;charset=utf-8,${json}`
+    download_link.href = url;
     download_link.download = `session-${conversation.id}.json`
     download_link.click();
+    URL.revokeObjectURL(url);
 }
