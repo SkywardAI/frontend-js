@@ -78,8 +78,8 @@ export function formatJSON(conversation, {createdAt, name}) {
         "createdAt": "${createdAt}",
         "title": "${name}",
         "history": [
-            ${conversation.history.map(({type, message})=>{
-                return `{ "type": "${type}", "message": "${message.replaceAll('"', '\\"').replaceAll("\n", "\\n")}" }`
+            ${conversation.history.map(({role, message})=>{
+                return `{ "role": "${role}", "message": "${message.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll("\n", "\\n")}" }`
             }).join(`,\n${" ".repeat(12)}`)}
         ]
     }
