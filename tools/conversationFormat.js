@@ -47,7 +47,10 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
         // replace white spaces, no need for single white space
         line = line.replaceAll('  ', '&nbsp;&nbsp;');
         if(end_special_block) {
-            pending_elem.insertAdjacentHTML("beforebegin",line+"</br>");
+            // we need this line to be plaintext instead of html
+            // otherwise if there's html code, this will be transformed, which we don't want this result
+            pending_elem.insertAdjacentText("beforebegin",line);
+            pending_elem.insertAdjacentHTML("beforebegin",'</br>');
         } else {
             const parsed_line = line
             .replace(/(#{6}|#{5}|#{4}|#{3}|#{2}|#{1}) (.*$)/, parseSingleLine('header'))
