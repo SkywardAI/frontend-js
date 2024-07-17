@@ -45,7 +45,7 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
         }
 
         // replace white spaces, no need for single white space
-        line = line.replaceAll('  ', '&nbsp;&nbsp;');
+            line = line.replaceAll('  ', '\xa0\xa0');
         if(end_special_block) {
             // we need this line to be plaintext instead of html
             // otherwise if there's html code, this will be transformed, which we don't want this result
