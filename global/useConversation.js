@@ -7,6 +7,7 @@ let currentConversation = {
     id: null,
     pending: false,
     name: '',
+    type: '',
     history: []
 };
 
@@ -41,7 +42,8 @@ async function startNewConversation() {
     storeHistory();
     const { sessionUuid } = await request('chat/seesionuuid');
     currentConversation = {
-        pending: false, id: sessionUuid, history: [], name: 'New Session'
+        pending: false, id: sessionUuid, 
+        history: [], name: 'New Session', type: ''
     };
     addHistory({
         id: currentConversation.id,
@@ -68,7 +70,7 @@ async function sendMessage(messages) {
     updateAll(currentConversation);
 }
 
-async function selectConversation(id, name) {
+async function selectConversation(id, name, type) {
     let history;
     if(currentUser.logged_in) {
         history = await request(`chat/history/${id}`);
@@ -76,7 +78,7 @@ async function selectConversation(id, name) {
         storeHistory();
         history = conversation_histories[id];
     }
-    currentConversation = { id, history, pending: false, name };
+    currentConversation = { id, history, pending: false, name, type };
     updateAll(currentConversation);
 }
 

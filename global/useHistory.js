@@ -16,8 +16,8 @@ async function requestUpdateHistory() {
     const chat_history = await request('chat');
 
     history.length = 0;
-    chat_history.forEach(({sessionUuid, name, createdAt}) => {
-        history.push({id: sessionUuid, name, createdAt});
+    chat_history.forEach(({sessionUuid, name, type, createdAt}) => {
+        history.push({id: sessionUuid, name, type, createdAt});
     });
     updateAll(history);
 }

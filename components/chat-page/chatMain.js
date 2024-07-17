@@ -302,7 +302,15 @@ function updateConversation() {
     if(!conversation.history) return;
     if(!conversation.history.length && main_elem) {
         main_elem.innerHTML = "<div class='greeting start-session'>Hi, how can I help you today?</div>"
-        main_elem.appendChild(createRAGSwitch());
+        if(!conversation.type) {
+            main_elem.appendChild(createRAGSwitch());
+        } else {
+            main_elem.insertAdjacentHTML("beforeend", 
+            `<div class='greeting rag-info'>RAG <strong>${
+                conversation.type === 'rag' ? 'ON' :
+                conversation.type === 'chat' ? 'OFF' : ''
+            }</strong></div>`)
+        }
         return;
     }
 
