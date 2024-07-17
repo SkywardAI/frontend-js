@@ -8,7 +8,7 @@ import getSVG from "../../tools/svgs.js";
 
 let conversation = {pending: false}, model_settings = {}, 
     main_elem, toggle_expand,
-    stream_response=true;
+    stream_response=true, download_conversation_icon;
 
 let abort_controller;
 
@@ -30,8 +30,11 @@ const {
                 Please select a ticket or start a new conversation on left.
             </div>`
             document.getElementById('submit-chat').innerHTML = '';
+            download_conversation_icon.classList.add('hidden')
         }
         return;
+    } else if(download_conversation_icon) {
+        download_conversation_icon.classList.remove('hidden')
     }
 
     updateConversation();
@@ -63,7 +66,7 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
             ${getSVG('gear')}
         </div>
         <div 
-            id='download-conversation' class='clickable function-icon'
+            id='download-conversation' class='clickable function-icon hidden'
             title="Export Current Conversation as JSON"
         >
             ${getSVG('box-arrow-up')}
@@ -83,7 +86,8 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
     main_elem = document.getElementById('conversation-main');
     document.getElementById('toggle-sidebar-expand').onclick = toggle_expand;
     document.getElementById('toggle-setting-page').onclick = openModelSetting;
-    document.getElementById('download-conversation').onclick = () => {
+    download_conversation_icon = document.getElementById('download-conversation')
+    download_conversation_icon.onclick = () => {
         if(conversation.id && conversation.history.length) {
             formatJSON(conversation, getHistory(conversation.id))
         }

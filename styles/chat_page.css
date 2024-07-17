@@ -142,6 +142,10 @@
     height: 100%;
 }
 
+.chat-outer-main .function-icon.hidden {
+    display: none;
+}
+
 #chat-main {
     --send-section-size: 50px;
     --leave-bottom: 15px;
