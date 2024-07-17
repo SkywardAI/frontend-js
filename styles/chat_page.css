@@ -247,12 +247,20 @@
     animation-delay: .6s;
 }
 
+.message .single-line {
+    margin-bottom: 5px;
+}
+
+.message .single-line:last-child {
+    margin-bottom: unset;
+}
+
 .message .code-block {
     background-color: #1f1f1f;
     color: white;
     padding: 20px 15px;
     border-radius: 7px;
-    margin-top: 5px;
+    margin: 10px 0px;
 }
 
 .message .inline-code {

@@ -45,11 +45,11 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
         }
 
         // replace white spaces, no need for single white space
-        line.replaceAll('  ', '&nbsp;&nbsp;');
+        line = line.replaceAll('  ', '&nbsp;&nbsp;');
         if(end_special_block) {
-            pending_elem.insertAdjacentHTML("beforebegin",line||"</br>");
+            pending_elem.insertAdjacentHTML("beforebegin",line+"</br>");
         } else {
-            const parsed_line = !line ? "</br>" : line
+            const parsed_line = line
             .replace(/(#{6}|#{5}|#{4}|#{3}|#{2}|#{1}) (.*$)/, parseSingleLine('header'))
             .replaceAll(/[*_]{3,}(.+?)[*_]{3,}/g, parseSingleLine('bold-italic'))
             .replaceAll(/\*\*(.+?)\*\*/g, parseSingleLine('bold'))
@@ -57,7 +57,7 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
             .replaceAll(/^(\*|-){3,}$/g, parseSingleLine('hr'))
             .replaceAll(/``(.+?)``|`(.+?)`/g, parseSingleLine('inline-code'))
 
-            pending_elem.insertAdjacentHTML("beforebegin", parsed_line);
+            pending_elem.insertAdjacentHTML("beforebegin", `<div class='single-line'>${parsed_line}</div>`);
         }
     }
 
