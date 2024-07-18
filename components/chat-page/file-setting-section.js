@@ -39,7 +39,10 @@ export default function fileSettingSection(title, submitted, restrictions = []) 
             }
         }
         const mb_size = Math.round(size / (1024 * 1024));
-        file_status_display.innerHTML = `<strong>${name}</strong> (${mb_size} MB)`
+        const strong_name = document.createElement('strong');
+        strong_name.textContent = name;
+        file_status_display.appendChild(strong_name);
+        file_status_display.insertAdjacentText("beforeend", ` (${mb_size} MB)`)
     }
 
     section.appendChild(upload_file_container);

@@ -15,7 +15,11 @@ message_dialog.show();
 
 /**
  * Display a notification with given type on top-right corner
- * @param {String} message - The message to show, can be html element in string
+ * @param {String | any[]} message 
+ *  The message to show, can be a `string` or an array with `string` or/and `HTMLElement`.  
+ *  **Note:**  
+    *  If pass a `string`, it will be parsed to HTML;  
+    *  If pass an `array` with `string`, strings in that array won't be parsed.
  * @param {messageOptions} options - Options of showing messages
  */
 export default function showMessage(message, options = {}) {
@@ -38,10 +42,22 @@ export default function showMessage(message, options = {}) {
 
     const message_elem = document.createElement('div');
     message_elem.className = `message ${type} ${close_on_click ? ' clickable':''}`;
-    message_elem.innerHTML = `
-    ${getSVG(icon, 'message-icon')}
-    <div class='message-text'>${message}</div>
-    `
+    message_elem.innerHTML = `${getSVG(icon, 'message-icon')}`;
+    const message_text = document.createElement('div');
+    message_text.className = 'message-text';
+    message_elem.appendChild(message_text);
+    if(typeof message === 'string') {
+        message_text.innerHTML = message;
+    } else if(Array.isArray(message)) {
+        message.forEach(elem => {
+            if(typeof elem === 'string') {
+                message_text.insertAdjacentText("beforeend", elem);
+            } else if(elem instanceof HTMLElement) {
+                message_text.insertAdjacentElement("beforeend", elem);
+            }
+        })
+    }
+    
     message_elem.style.animationDuration = `${animation_duration}ms`
     message_dialog.appendChild(message_elem);
     

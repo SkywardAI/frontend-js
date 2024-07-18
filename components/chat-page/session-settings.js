@@ -31,7 +31,9 @@ export default function createSessionSettings(main) {
             return;
         } else {
             rename(new_name).then(success=>{
-                if(success) showMessage(`Session renamed to </br><strong>${new_name}</strong>`, { type: 'success' });
+                const strong_name = document.createElement('strong');
+                strong_name.textContent = new_name;
+                if(success) showMessage([`Session renamed to`, document.createElement('br'), strong_name], { type: 'success' });
                 else showMessage('Rename session failed!', { type: 'err' })
             })
         }
