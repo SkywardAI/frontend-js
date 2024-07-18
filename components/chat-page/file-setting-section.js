@@ -29,8 +29,10 @@ export default function fileSettingSection(title, submitted, restrictions = []) 
         if(restrictions.length) {
             const ext = name.split('.').pop();
             if(!restrictions.includes(ext)) {
+                const strong_ext = document.createElement('strong');
+                strong_ext.textContent = `.${ext}`;
                 showMessage(
-                    `The file with extension <strong>.${ext}</strong> is not valid for this section.`, 
+                    [`The file with extension `,strong_ext,` is not valid for this section.`], 
                     { type: 'warn' }
                 );
                 evt.target.value = ''
