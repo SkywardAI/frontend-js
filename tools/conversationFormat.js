@@ -45,11 +45,14 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
         }
 
         // replace white spaces, no need for single white space
-        line.replaceAll('  ', '&nbsp;&nbsp;');
+            line = line.replaceAll('  ', '\xa0\xa0');
         if(end_special_block) {
-            pending_elem.insertAdjacentHTML("beforebegin",line||"</br>");
+            // we need this line to be plaintext instead of html
+            // otherwise if there's html code, this will be transformed, which we don't want this result
+            pending_elem.insertAdjacentText("beforebegin",line);
+            pending_elem.insertAdjacentHTML("beforebegin",'</br>');
         } else {
-            const parsed_line = !line ? "</br>" : line
+            const parsed_line = line
             .replace(/(#{6}|#{5}|#{4}|#{3}|#{2}|#{1}) (.*$)/, parseSingleLine('header'))
             .replaceAll(/[*_]{3,}(.+?)[*_]{3,}/g, parseSingleLine('bold-italic'))
             .replaceAll(/\*\*(.+?)\*\*/g, parseSingleLine('bold'))
@@ -57,7 +60,7 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
             .replaceAll(/^(\*|-){3,}$/g, parseSingleLine('hr'))
             .replaceAll(/``(.+?)``|`(.+?)`/g, parseSingleLine('inline-code'))
 
-            pending_elem.insertAdjacentHTML("beforebegin", parsed_line);
+            pending_elem.insertAdjacentHTML("beforebegin", `<div class='single-line'>${parsed_line}</div>`);
         }
     }
 
@@ -79,13 +82,18 @@ export function formatJSON(conversation, {createdAt, name}) {
         "title": "${name}",
         "history": [
             ${conversation.history.map(({role, message})=>{
-                return `{ "role": "${role}", "message": "${message.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll("\n", "\\n")}" }`
+                const msg_str = message.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll("\n", "\\n")
+                return `{ "role": "${role}", "message": "${msg_str}" }`
             }).join(`,\n${" ".repeat(12)}`)}
         ]
     }
 }`
+
+    const json_file = new Blob([json], {type: 'text/plain'});
+    const url = URL.createObjectURL(json_file);
     const download_link = document.createElement('a')
-    download_link.href=`data:text/plain;charset=utf-8,${json}`
+    download_link.href = url;
     download_link.download = `session-${conversation.id}.json`
     download_link.click();
+    URL.revokeObjectURL(url);
 }

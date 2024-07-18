@@ -142,6 +142,10 @@
     height: 100%;
 }
 
+.chat-outer-main .function-icon.hidden {
+    display: none;
+}
+
 #chat-main {
     --send-section-size: 50px;
     --leave-bottom: 15px;
@@ -181,6 +185,68 @@
     font-size: 20px;
     user-select: none;
     max-width: 80%;
+    text-align: center;
+}
+
+#conversation-main .greeting.start-session {
+    font-size: 30px;
+}
+
+@keyframes rag-info-show {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+#conversation-main .greeting.rag-info {
+    font-size: 25px;
+    margin-top: 20px;
+    animation: rag-info-show .5s forwards;
+}
+
+#conversation-main .rag-select {
+    --option-width: 160px;
+    --option-height: 100px;
+
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    align-items: center;
+    margin: auto;
+    margin-top: 40px;
+    transition-duration: 1s;
+    transform-origin: top;
+}
+
+#conversation-main .rag-select.completed {
+    transform: scale(0) translateY(100%);
+}
+
+#conversation-main .rag-select .option {
+    width: 160px;
+    height: 100px;
+    text-align: left;
+    border: 1px solid lightgray;
+    padding: 20px;
+    transition-duration: .3s;
+    border-radius: 15px;
+    margin: 0px 15px;
+    color: gray;
+}
+
+#conversation-main .rag-select .option:first-child {
+    margin-left: auto;
+}
+#conversation-main .rag-select .option:last-child {
+    margin-right: auto;
+}
+
+#conversation-main .rag-select .option.disabled {
+    background-color: lightgray;
+    border-color: gray;
+}
+
+#conversation-main .rag-select .option:not(.disabled):hover {
+    background-color: var(--transparent-gray-bg);
 }
 
 #conversation-main .conversation-block {
@@ -247,12 +313,20 @@
     animation-delay: .6s;
 }
 
+.message .single-line {
+    margin-bottom: 15px;
+}
+
+.message .single-line:last-child {
+    margin-bottom: unset;
+}
+
 .message .code-block {
     background-color: #1f1f1f;
     color: white;
     padding: 20px 15px;
     border-radius: 7px;
-    margin-top: 5px;
+    margin: 10px 0px;
 }
 
 .message .inline-code {
@@ -320,128 +394,4 @@
 }
 #submit-chat.pending .abort-message {
     display: flex !important;
-}
-
-/* 
-=====================================================
-
-                   MODEL SETTINGS
-
-=====================================================
-*/
-
-.chat-settings {
-    --model-setting-width: 400px;
-    --model-setting-height: 500px;
-
-    position: relative;
-    margin: auto;
-    width: var(--model-setting-width);
-    height: var(--model-setting-height);
-    top: calc((100vh - var(--model-setting-height)) / 3);
-    overflow-y: auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-.chat-settings .session-settings.disabled {
-    display: none;
-}
-
-.chat-settings .title {
-    margin: 10px 20px;
-    font-size: 25px;
-    font-weight: bolder;
-    text-align: center;
-}
-
-.chat-settings .sub-title {
-    text-align: center;
-    font-size: 13px;
-    color: gray;
-    margin-bottom: 7px;
-}
-
-.chat-settings .setting-section {
-    --input-height: 40px;
-
-    width: 100%;
-    padding: 15px 20px;
-    box-sizing: border-box;
-    display: block;
-}
-
-.chat-settings .setting-section .title {
-    margin: unset;
-    margin-bottom: 6px;
-    font-size: 17px;
-    font-weight: unset;
-    text-align: left;
-}
-
-.chat-settings .setting-section input[type="text"] {
-    height: var(--input-height);
-    box-sizing: border-box;
-    border-radius: 5px;
-    padding: 0px 10px;
-    border: 1px solid gray;
-    width: 100%;
-}
-.chat-settings .setting-section input[type="text"]:focus {
-    outline: none;
-    border-width: 2px;
-}
-
-.chat-settings .setting-section .input-with-confirm {
-    position: relative;
-}
-
-.chat-settings .setting-section .input-with-confirm .confirm-input {
-    height: var(--input-height);
-    width: var(--input-height);
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: flex;
-    align-items: center;
-    color: dodgerblue;
-}
-.chat-settings .setting-section .input-with-confirm .confirm-input svg {
-    margin: auto;
-    width: 50%;
-    height: 50%;
-}
-
-.chat-settings .setting-section .combined-section {
-    --item-margin: 10px;
-    display: flex;
-    align-items: center;
-}
-.chat-settings .setting-section .combined-section * { margin: auto; margin-right: var(--item-margin); }
-.chat-settings .setting-section .combined-section *:last-child { margin-right: unset; }
-
-.chat-settings .setting-section .combined-section.range {
-    width: 100%;
-    --restore-default-icon-size: 20px;
-    --range-input-width: calc(75% - var(--restore-default-icon-size));
-    --text-input-width: 25%;
-}
-
-.chat-settings .setting-section .combined-section.range input[type="range"] {
-    width: var(--range-input-width);
-}
-.chat-settings .setting-section .combined-section.range input[type="text"] {
-    width: var(--text-input-width);
-    border-radius: 10px;
-    text-align: center;
-}
-.chat-settings .setting-section .combined-section.range .restore-default-icon {
-    width: var(--restore-default-icon-size);
-    height: var(--restore-default-icon-size);
-    color: dodgerblue;
-}
-.chat-settings .setting-section .combined-section.range .restore-default-icon svg {
-    width: 100%;
-    height: 100%;
 }
