@@ -1,69 +1,116 @@
-.model-hero #available-models {
-    width: 200px;
+.model-hero .title {
+    text-align: center;
+    font-size: 25px;
+    height: 20vh;
+    align-content: center;
+}
+
+/* 
+=====================================================
+
+                       SEARCH
+
+=====================================================
+*/
+
+.model-hero #search-template {
+    --search-height: 50px;
+
+    display: block;
+    position: relative;
+    width: 50%;
+    height: var(--search-height);
+    margin: auto;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#search-template .search-input {
+    background-color: var(--transparent-gray-bg);
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding: 0px 20px;
+    box-sizing: border-box;
+    transition-duration: .3s;
+}
+
+#search-template .search-input:hover,
+#search-template .search-input:focus {
+    background-color: var(--gray-bg);
+    outline: none;
+}
+
+#search-template .submit-search-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--search-height);
+    height: var(--search-height);
+}
+
+#search-template .submit-search-container .submit-search {
+    width: 100%;
     height: 100%;
     position: absolute;
     left: 0;
     top: 0;
-    border-right: 1px dashed gray;
 }
 
-.model-hero #models-playground {
-    width: calc(100% - 200px);
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    padding: 20px;
-    overflow-y: auto;
+#search-template .submit-search-container .submit-search.btn {
+    z-index: 2;
+    opacity: 0;
 }
 
-.model-hero .model-block {
-    width: fit-content;
-    height: fit-content;
-    padding: 10px 30px;
-    border: 1px solid gray;
-    border-radius: 5px;
-    min-width: 150px;
+#search-template .submit-search-container .submit-search.icon {
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+#search-template .submit-search-container .submit-search.icon svg {
+    width: 30%;
+    height: 30%;
+    margin: auto;
+}
+
+/* 
+=====================================================
+
+                    SELECT TEMPLATES
+
+=====================================================
+*/
+
+.model-hero #display-templates {
+    height: 200px;
+    width: 60%;
     position: relative;
-}
-
-.model-block .model-title {
-    font-size: 18px;
-    margin: 5px 0px;
-}
-
-.model-block .param-input {
-    width: 150px;
-    height: 30px;
-    padding: 0px 10px;
-    border: 1px solid gray;
-    border-radius: 5px;
-}
-
-.model-block .remove-model {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-}
-
-.model-block.linear { background-color: beige; }
-.model-block.dropout { background-color: aliceblue; }
-.model-block.softmax { background-color: lavenderblush; }
-
-.model-hero #available-models .model-block {
     margin: auto;
-    margin-top: 20px;
-    box-shadow: 3px 3px 5px gray;
+    margin-top: 50px;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
 }
 
-#finish-build {
-    margin: auto;
-    width: 130px;
-    height: fit-content;
-    padding: 10px 20px;
-    margin-top: 30px;
-    border: 3px inset gray;
-    border-radius: 30px;
-    text-align: center;
-    background-color: azure;
+.model-hero #display-templates .template-card {
+    min-width: 400px;
+    height: 100%;
+    background-color: white;
+    border-radius: 15px;
+    margin: 0px 20px;
+    display: block;
+    border: 1px solid;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+}
+
+@media screen and (max-width: 900px) {
+    .model-hero #display-templates .template-card {
+        min-width: 100px;
+        max-width: calc((100% - 40px) * 0.8);
+    }
 }
