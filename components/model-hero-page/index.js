@@ -1,77 +1,107 @@
-import generateKey from "../../tools/generateKey.js";
-import createModelBlock from "./modelBlock.js";
+import debounce from '../../tools/debounce.js';
+import getSVG from '../../tools/svgs.js'
 
-const available_models = {
-    linear: { has_params: true },
-    dropout: { has_params: true },
-    softmax: { has_params: true },
-}
-const builtModels = {}
-let models_playground;
+const templates = [
+    { name: 'template 1' },
+    { name: 'template 2' },
+]
+
+let display_templates, card_width = 0, move_length = 0, current_position = 'first';
 
 export default function createModelHeroPage() {
-
     const main = document.getElementById('main');
     main.innerHTML = `
     <div class='model-hero'>
-        <div id='available-models'>
-            <div id='finish-build' class='clickable'>Save</div>
-        </div>
-        <div id='models-playground'></div>
+        <div class='title'>Model Hero Templates</div>
+        <form id='search-template'>
+            <input 
+                type='text' name='search' 
+                class='search-input' autocomplete="off"
+                placeholder="Search for templates here"    
+            >
+            <div class='submit-search-container'>
+                <input type='submit' class='submit-search btn clickable'>
+                <div class='submit-search icon'>${getSVG('search')}</div>
+            </div>
+        </form>
+        <div id='display-templates'>${
+            templates.map(e=>{
+                return `<div class='template-card'>${e.name}</div>`
+            }).join('')
+        }</div>
+        <div id='selected-template'></div>
     </div>`
 
-    models_playground = document.getElementById('models-playground')
-    document.getElementById('finish-build').onclick = saveBuilder;
-    fillAvailableModels();
-    rebuildPlayground();
+    const search_template = document.getElementById('search-template');
+    display_templates = document.getElementById('display-templates');
+    // const selected_template = document.getElementById('selected-template');
 
-    return null;
+    search_template.onsubmit = submitSearchTemplate;
+
+    document.addEventListener("resize", windowResized);
+    display_templates.addEventListener('wheel', scrollTemplates);
+
+    windowResized();
+
+    const template_cards = Array.from(document.querySelectorAll('#display-templates .template-card'));
+    const append_first_list = template_cards.slice(-2).map(e=>e.cloneNode(true));
+    const append_last_list = template_cards.slice(0,2).map(e=>e.cloneNode(true));
+
+    const append_first = append_first_list[0];
+    const append_last = append_last_list[0];
+
+    display_templates.append(...append_last_list);
+    display_templates.firstElementChild.before(...append_first_list);
+
+    display_templates.scrollTo({ left: card_width*2, behavior: 'instant' })
+
+    const obverver = new IntersectionObserver(entries=>{
+        entries.forEach(e=>{
+            if(!e.isIntersecting) {
+                current_position = '';
+            } else if(e.target === append_first) {
+                current_position = 'first'
+            } else if(e.target === append_last) {
+                current_position = 'last';
+            }
+        })
+    }, { root: display_templates });
+
+    obverver.observe(append_first)
+    obverver.observe(append_last)
+
+    return () => {
+        document.removeEventListener("resize", windowResized);
+        document.removeEventListener("wheel", scrollTemplates);
+        obverver.disconnect();
+    };
 }
 
-function fillAvailableModels() {
-    const finish_build_btn = document.getElementById('finish-build')
-    for(const key in available_models) {
-        const model_block = createModelBlock(key);
-        model_block.classList.add('clickable')
-        model_block.onclick = () => {
-            addModelToPlayground(key);
-        }
-        finish_build_btn.before(model_block);
+function submitSearchTemplate(evt) {
+    evt.preventDefault();
+
+    const search_value = evt.target.search.value;
+    console.log(search_value)
+    evt.target.search.value = '';
+}
+
+const adjustScroll = debounce((direction)=>{
+    if(current_position === 'last' && direction) {
+        display_templates.scrollTo({ left: move_length, behavior: 'instant' })
+    } else if(current_position === 'first' && !direction) {
+        display_templates.scrollTo({ left: display_templates.scrollWidth  - card_width*3 - move_length, behavior: 'instant' })
+        // return;
     }
+
+    const multiplier = direction ? move_length : -move_length;
+    display_templates.scrollLeft += multiplier;
+}, 20)
+
+function windowResized() {
+    card_width = display_templates.firstElementChild.clientWidth;
+    move_length = card_width * 0.6;
 }
 
-function rebuildPlayground() {
-    if(Object.keys(builtModels).length) {
-        for(const key in builtModels) {
-            models_playground.appendChild(builtModels[key].elem);
-        }
-    }
-}
-
-function addModelToPlayground(key) {
-    let unique_key;
-    do {
-        unique_key = generateKey();
-    } while(unique_key in builtModels)
-
-    const { has_params } = available_models[key];
-    const [ elem, getValue ] = createModelBlock(key, true, ()=>removeModel(unique_key), has_params)
-    models_playground.appendChild(elem);
-
-    builtModels[unique_key] = { type: key, elem, getValue };
-}
-
-function removeModel(key) {
-    builtModels[key].elem.remove();
-    delete builtModels[key];
-}
-
-function saveBuilder() {
-    const built_models =[];
-    for(const key in builtModels) {
-        const {type, getValue} = builtModels[key];
-        const value = getValue();
-        built_models.push({ type, value });
-    }
-    console.log(built_models);
+function scrollTemplates(evt) {
+    adjustScroll(evt.deltaY > 0)
 }
