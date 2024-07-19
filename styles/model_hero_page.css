@@ -1,4 +1,4 @@
-.model-hero .title {
+.model-hero>.title {
     text-align: center;
     font-size: 25px;
     height: 20vh;
@@ -82,11 +82,42 @@
 =====================================================
 */
 
+.model-hero .templates-section {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: fit-content;
+}
+
+.model-hero .templates-section .switch-template {
+    margin: auto;
+    width: 30px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    background-color: var(--transparent-gray-bg);
+    border-radius: 5px;
+    transition-duration: .3s;
+}
+.model-hero .templates-section .switch-template:first-child {
+    margin-right: 20px;
+}
+.model-hero .templates-section .switch-template:last-child {
+    margin-left: 20px;
+}
+.model-hero .templates-section .switch-template svg {
+    margin: auto;
+    width: 20px;
+    height: 20px;
+}
+.model-hero .templates-section .switch-template.last svg {
+    transform: rotate(180deg);
+}
+
 .model-hero #display-templates {
-    height: 200px;
+    height: 230px;
     width: 60%;
     position: relative;
-    margin: auto;
     margin-top: 50px;
     overflow-y: hidden;
     display: flex;
@@ -99,18 +130,40 @@
 .model-hero #display-templates .template-card {
     min-width: 400px;
     height: 100%;
-    background-color: white;
-    border-radius: 15px;
-    margin: 0px 20px;
+    border-radius: 10px;
+    margin: 0px 10px;
     display: block;
-    border: 1px solid;
     scroll-snap-align: center;
     scroll-snap-stop: always;
+    background-color: var(--transparent-gray-bg);
+    padding: 20px;
+    border: 1px solid lightgray;
+    transition-duration: .3s;
+}
+
+.model-hero .templates-section .switch-template:hover,
+.model-hero #display-templates .template-card:hover {
+    background-color: var(--gray-bg);
 }
 
 @media screen and (max-width: 900px) {
     .model-hero #display-templates .template-card {
         min-width: 100px;
-        max-width: calc((100% - 40px) * 0.8);
+        max-width: calc((100% - 20px) * 0.8);
     }
+}
+
+#display-templates .template-card .title {
+    font-size: 29px;
+    height: 35px;
+    margin-bottom: 7px;
+    text-wrap: nowrap;
+}
+
+#display-templates .template-card .description {
+    word-wrap: break-word;
+    font-size: 18px;
+    width: 100%;
+    height: calc(100% - 50px);
+    overflow-y: auto;
 }
