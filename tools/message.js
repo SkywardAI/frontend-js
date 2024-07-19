@@ -49,13 +49,7 @@ export default function showMessage(message, options = {}) {
     if(typeof message === 'string') {
         message_text.innerHTML = message;
     } else if(Array.isArray(message)) {
-        message.forEach(elem => {
-            if(typeof elem === 'string') {
-                message_text.insertAdjacentText("beforeend", elem);
-            } else if(elem instanceof HTMLElement) {
-                message_text.insertAdjacentElement("beforeend", elem);
-            }
-        })
+        message_text.append(...message);
     }
     
     message_elem.style.animationDuration = `${animation_duration}ms`
