@@ -56,7 +56,6 @@ function switchPage(page) {
 }
 
 export default function createTrainingPage() {
-
     document.getElementById("main").innerHTML = `
     <div class='training-main'>
         <div id='training-tabs'></div>
@@ -77,6 +76,10 @@ export default function createTrainingPage() {
         tabs.appendChild(tab);
     })
 
-    switchPage(pages[0].index)
+
+    const loaded_page = current_page;
+    current_page = '';
+
+    switchPage(loaded_page || pages[0].index);
     return null;
 }
