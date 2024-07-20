@@ -108,9 +108,6 @@
     bottom: 5px;
     background-color: transparent;
 }
-.input-details-main .account-field-container input:focus {
-    outline: none;
-}
 
 .password-eye-icon {
     position: absolute;

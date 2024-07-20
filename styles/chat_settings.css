@@ -50,14 +50,12 @@
 
 .chat-settings .setting-section input[type="text"] {
     height: var(--input-height);
-    box-sizing: border-box;
     border-radius: 5px;
     padding: 0px 10px;
     border: 1px solid gray;
     width: 100%;
 }
 .chat-settings .setting-section input[type="text"]:focus {
-    outline: none;
     border-width: 2px;
 }
 
