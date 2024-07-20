@@ -189,6 +189,7 @@ section.params > div {
     width: fit-content;
     float: left;
     margin-top: 15px;
+    min-width: 18% !important;
 }
 
 section.params > div.advanced {
