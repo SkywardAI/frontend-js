@@ -49,37 +49,20 @@
     text-align: left;
 }
 
-.chat-settings .setting-section input[type="text"] {
+.chat-settings .setting-section input[type="text"],
+.chat-settings .setting-section select {
     height: var(--input-height);
     box-sizing: border-box;
     border-radius: 5px;
     padding: 0px 10px;
     border: 1px solid gray;
     width: 100%;
+    background-color: white;
 }
-.chat-settings .setting-section input[type="text"]:focus {
+.chat-settings .setting-section input[type="text"]:focus,
+.chat-settings .setting-section select:focus {
     outline: none;
     border-width: 2px;
-}
-
-.chat-settings .setting-section .input-with-confirm {
-    position: relative;
-}
-
-.chat-settings .setting-section .input-with-confirm .confirm-input {
-    height: var(--input-height);
-    width: var(--input-height);
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: flex;
-    align-items: center;
-    color: dodgerblue;
-}
-.chat-settings .setting-section .input-with-confirm .confirm-input svg {
-    margin: auto;
-    width: 50%;
-    height: 50%;
 }
 
 .chat-settings .setting-section .combined-section {
