@@ -195,3 +195,65 @@ section.params > div {
 section.params > div.advanced {
     text-align: center;
 }
+
+.mock-dialog.show.modal:has(.advanced-setting-table) {
+    align-content: center;
+}
+
+.advanced-setting-table {
+    background-color: white;
+    padding: 30px 50px;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    border-radius: 10px;
+    max-height: 80%;
+    max-width: 100%;
+    overflow-y: auto;
+}
+
+.advanced-setting-table table {
+    border-collapse: collapse;
+}
+
+.advanced-setting-table thead th,
+.advanced-setting-table tbody td {
+    padding: 0px 10px;
+    position: relative;
+}
+
+.advanced-setting-table tbody tr:has(td input:focus) {
+    background-color: var(--transparent-gray-bg);
+}
+.advanced-setting-table tbody td .show-boolean-value,
+.advanced-setting-table tbody td input {
+    height: 40px;
+    padding: 0px 10px;
+    width: 200px;
+    border: none;
+    background-color: transparent;
+    border-bottom: 1px solid gray;
+    font-size: 15px;
+}
+
+.advanced-setting-table tbody td .show-boolean-value {
+    align-content: center;
+}
+
+.advanced-setting-table tbody td input[type='checkbox'] {
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+}
+
+.advanced-setting-table tr {
+    /* works as margin */
+    border-bottom: 10px solid white;
+}
+
+.advanced-setting-table tbody tr:has(td input:focus) {
+    background-color: var(--transparent-gray-bg);
+}
+
