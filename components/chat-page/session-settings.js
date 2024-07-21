@@ -1,4 +1,5 @@
 import useConversation from '../../global/useConversation.js';
+import useUser from '../../global/useUser.js';
 import showMessage from '../../tools/message.js';
 import request from '../../tools/request.js';
 import fileSettingSection from './file-setting-section.js';
@@ -16,9 +17,18 @@ const { rename } = useConversation(c=>{
     current_conversation = c;
 });
 
+let login = false;
+useUser(user=>{
+    login = user.id !== null;
+    if(session_settings) {
+        session_settings.classList.toggle('no-rag', !login)
+    }
+})
+
 export default function createSessionSettings(main) {
     session_settings = document.createElement('div');
     session_settings.className = 'session-settings disabled'
+    if(!login) session_settings.classList.add('no-rag')
     session_settings.innerHTML = `
     <div class='title'>Adjust Session Settings</div>
     <div class='sub-title'>* Cannot change RAG settings after session started *</div>
@@ -56,6 +66,7 @@ export default function createSessionSettings(main) {
             showMessage("File upload success!", { type: "success" });
         }
     }, ['csv'])
+    csv_upload_elem.classList.add('rag-option')
     session_settings.appendChild(csv_upload_elem)
 
     main.appendChild(session_settings);

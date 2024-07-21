@@ -13,6 +13,7 @@
     border-radius: 10px;
 }
 
+.chat-settings .session-settings.no-rag .rag-option,
 .chat-settings .session-settings.disabled {
     display: none;
 }

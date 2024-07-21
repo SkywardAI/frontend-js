@@ -1,11 +1,17 @@
 import request from "../../tools/request.js";
 import showMessage from "../../tools/message.js";
+import useUser from "../../global/useUser.js";
 
 const rag_modes = [
     { mode: 'on' },
     { mode: 'off' },
     { mode: 'hybrid', disabled: true },
 ]
+
+let user_id = null;
+useUser(user=>{
+    user_id = user.id;
+})
 
 async function updateRAG(mode, element, id) {
     if(mode === 'on') {
@@ -32,12 +38,12 @@ async function updateRAG(mode, element, id) {
 }
 
 export default function createRAGSelector(conversation) {
-    if(conversation.type) {
+    if(conversation.type || user_id === null) {
         const rag_info = document.createElement('div');
         rag_info.className = 'greeting rag-info';
         rag_info.innerHTML = `RAG <strong>${
             conversation.type === 'rag' ? 'ON' :
-            conversation.type === 'chat' ? 'OFF' : ''
+            conversation.type === 'chat' || user_id === null ? 'OFF' : ''
         }</strong>`
         return rag_info;
     }
