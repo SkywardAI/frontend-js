@@ -1,27 +1,5 @@
 // const dataset_options = []
 // const model_options = []
-// const settings = {
-//     output_dir: "WANDB_NAME",
-//     evaluation_strategy: "steps",
-//     do_eval: true,
-//     optim: "adamw_8bit",
-//     per_device_train_batch_size: 8,
-//     gradient_accumulation_steps: 2,
-//     per_device_eval_batch_size: 8,
-//     log_level: "debug",
-//     logging_steps: 100,
-//     learning_rate: 8e-6,
-//     eval_steps: 100,
-//     save_steps: 100,
-//     save_strategy: "epoch",
-//     num_train_epochs: 1,
-//     warmup_ratio: 0.1,
-//     lr_scheduler_type: "linear",
-//     beta: 0.1,
-//     max_length: 1024,
-//     report_to: "wandb",
-//     run_name: 'WANDB_NAME'
-// }
 
 import loadFAQPage from "./faq-page.js";
 import loadParametersPage from "./parameters-page.js";
