@@ -6,13 +6,15 @@ const defaultSettings = {
     top_k: 40,
     top_p: 0.9,
     n_predict: 512,
+    collection_name: 'collection_name'
 }
 
 const savedSettings = localStorage.getItem('model-settings') ?
-JSON.parse(localStorage.getItem('model-settings')) : null;
+JSON.parse(localStorage.getItem('model-settings')) : {};
 
 let currentSettings = {
-    ...(savedSettings || defaultSettings)
+    ...savedSettings,
+    ...defaultSettings
 }
 
 const writeSettingsToLocal = debounce(()=>{
