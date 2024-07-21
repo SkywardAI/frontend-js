@@ -7,6 +7,14 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
     let content_left = ''
     if(!force) content_left = whole_lines.pop();
     pending_elem.textContent = content_left;
+    const inline_codes = [];
+
+    function addInlineCode(content) {
+        const code_span = document.createElement('span');
+        code_span.className = 'inline-code';
+        code_span.textContent = content;
+        inline_codes.push(code_span)
+    }
 
     function parseSingleLine(pattern_name) {
         return (_, group_1, group_2) => {
@@ -17,7 +25,9 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
                 case 'italic': return `<em>${group_1}</em>`;
                 case 'bold-italic': return `<em><strong>${group_1}</strong></em>`;
                 case 'hr': return '</hr>';
-                case 'inline-code': return `<span class="inline-code">${group_2||group_1}</span>`;
+                case 'inline-code': 
+                    addInlineCode(group_1 || group_2)
+                    return `<|SPLIT_BY_INLINE_CODE|>`;
             }
         }
     }
@@ -59,8 +69,25 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
             .replaceAll(/__(.+?)__/g, parseSingleLine('italic'))
             .replaceAll(/^(\*|-){3,}$/g, parseSingleLine('hr'))
             .replaceAll(/``(.+?)``|`(.+?)`/g, parseSingleLine('inline-code'))
+            .replace(/<\|end\|>$/, '');
 
-            pending_elem.insertAdjacentHTML("beforebegin", `<div class='single-line'>${parsed_line}</div>`);
+            const block = document.createElement('div');
+            block.className = 'single-line';
+            if(inline_codes.length) {
+                const elems_to_append = [];
+                const text_elements = parsed_line.split('<|SPLIT_BY_INLINE_CODE|>')
+                while(text_elements.length) {
+                    elems_to_append.push(text_elements.shift());
+                    elems_to_append.push(inline_codes.shift() || '');
+                }
+                for(const i of elems_to_append) {
+                    if(typeof i === 'string') block.insertAdjacentHTML("beforeend", i);
+                    else if(i instanceof HTMLElement) block.appendChild(i);
+                }
+            } else {
+                block.innerHTML = parsed_line;
+            }
+            pending_elem.insertAdjacentElement("beforebegin", block);
         }
     }
 
