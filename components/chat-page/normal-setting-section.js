@@ -18,6 +18,7 @@ export default function normalSettigSection(type, title, callback, ...args) {
         input_like = document.createElement('select');
         args[0].forEach(({value, title})=>{
             const option = document.createElement('option');
+            option.value = value;
             option.textContent = title || value;
             input_like.appendChild(option);
         })
