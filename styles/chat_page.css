@@ -327,6 +327,7 @@
     padding: 20px 15px;
     border-radius: 7px;
     margin: 10px 0px;
+    width: 100%;
 }
 
 .message .inline-code {
