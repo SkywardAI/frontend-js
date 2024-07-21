@@ -1,46 +1,259 @@
 .training-main {
-    padding: 20px;
+    --tabs-height: 40px;
+    --main-height: 90vh;
+    background-color: var(--transparent-gray-bg);
+    width: 100%;
+    height: 100%;
 }
 
-.training-main .title {
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.training-main .option-set {
+.training-main #training-tabs {
+    width: 100%;
+    height: var(--tabs-height);
+    position: absolute;
+    bottom: var(--main-height);
     display: flex;
-    margin-top: 20px;
+    background-color: transparent;
     align-items: center;
 }
 
-.training-main .option-set .option-name {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.training-main .option-set select {
-    margin: 0px 50px;
-    width: 200px;
-    height: 35px;
-}
-
-.training-main .show-json-setting {
-    width: 500px;
-    height: 400px;
-    overflow: auto;
-    margin-top: 50px;
-    padding: 20px;
-    box-sizing: border-box;
+.training-main #training-tabs .tab {
+    margin: 0px 3px;
+    margin-bottom: auto;
+    min-width: 200px;
+    padding: 7px;
+    height: calc(100% - 7px);
+    text-align: center;
+    position: relative;
     border-radius: 10px;
-    font-size: 17px;
+    user-select: none;
+}
+.training-main #training-tabs .tab:hover {
+    background-color: var(--gray-bg);
 }
 
-.training-main .save-btn {
-    margin-top: 20px;
-    width: 100px;
+.training-main #training-tabs .tab.selected {
+    background-color: white;
+    border-bottom-right-radius: unset;
+    border-bottom-left-radius: unset;
+    height: 100%;
+}
+
+.training-main #training-tabs .tab:not(:first-child):before,
+.training-main #training-tabs .tab.selected::after {
+    content: "";
+    position: absolute;
+    height: 60%;
+    width: 3px;
+    background-color: lightgray;
+    left: 0;
+    top: 20%;
+    border-radius: 3px;
+}
+
+.training-main #training-tabs .tab.selected::before,
+.training-main #training-tabs .tab.selected::after {
+    background-color: transparent;
+    height: 10px;
+    width: 10px;
+    top: unset;
+    bottom: 0;
+    border-radius: unset;
+}
+.training-main #training-tabs .tab.selected::before {
+    background-image: radial-gradient(circle at top left, transparent 70%, white 30%);
+    left: -10px;
+}
+.training-main #training-tabs .tab.selected::after {
+    background-image: radial-gradient(circle at top right, transparent 70%, white 30%);
+    left: unset;
+    right: -10px;
+}
+
+.training-main #training-tabs .tab:not(.selected):hover::before,
+.training-main #training-tabs .tab:hover+.tab:not(.selected):before,
+.training-main #training-tabs .tab.selected+.tab:not(.selected):before {
+    display: none;
+}
+
+.training-main #training-page-main {
+    width: 100%;
+    height: var(--main-height);
+    position: absolute;
+    bottom: 0;
+    background-color: white;
+    padding-top: 10px;
+}
+
+.training-main #training-page-main #training-params {
+    width: 100%;
+    height: 100%;
+    
+    display: grid;
+    grid-template-rows: repeat(2, 30%) 1fr;
+    grid-template-columns: 2fr 20%;
+}
+
+.training-main #training-page-main #training-params > section {
+    border: 0px solid lightgray;
+    border-bottom-width: 1px;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+}
+
+#training-params section.token {
+    grid-row: 1;
+    grid-column: 1;
+}
+#training-params section.model {
+    grid-row: 2;
+    grid-column: 1;
+}
+#training-params section.params {
+    grid-row: 3;
+    grid-column: 1 / 3;
+    display: block !important;
+}
+#training-params section.function {
+    grid-row: 1 / 3;
+    grid-column: 2;
+    border-left-width: 1px !important;
+}
+
+/* 
+=====================================================
+
+                    UNION STYLES
+
+=====================================================
+*/
+
+#training-params > section > div {
+    margin-left: 20px;
+    min-height: 70%;
+    border: 1px solid gray;
     padding: 10px 20px;
-    border: 1px solid;
+    border-radius: 10px;
+    min-width: 20%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-content: center;
+    transform-origin: center;
+    transition-duration: .3s;
+}
+
+#training-params > section > div .title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    user-select: none;
+}
+
+#training-params > section > div input[type="text"],
+#training-params > section > div select {
+    width: 100%;
+    height: 35px;
+    padding: 0px 10px;
     border-radius: 7px;
+    border: 1px solid gray;
+    background-color: white;
+}
+
+#training-params > section > div:hover,
+#training-params > section > div:has(input[type="text"]:focus),
+#training-params > section > div:has(select:focus) {
+    transform: scale(1.05);
+}
+
+#training-params section.function {
+    flex-direction: column;
+}
+#training-params section.function button {
+    width: 70%;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background-color: dodgerblue;
+    color: white;
+    font-size: 20px;
+    transition-duration: .5s;
+}
+#training-params section.function button:hover {
+    background-color: rgb(0, 113, 226);
+}
+#training-params section.function button:first-child { margin-top: auto; margin-bottom: 10%; }
+#training-params section.function button:last-child { margin-bottom: auto; }
+
+section.params > div {
+    min-height: 40% !important;
+    width: fit-content;
+    float: left;
+    margin-top: 15px;
+    min-width: 18% !important;
+}
+
+section.params > div.advanced {
     text-align: center;
 }
+
+.mock-dialog.show.modal:has(.advanced-setting-table) {
+    align-content: center;
+}
+
+.advanced-setting-table {
+    background-color: white;
+    padding: 30px 50px;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    border-radius: 10px;
+    max-height: 80%;
+    max-width: 100%;
+    overflow-y: auto;
+}
+
+.advanced-setting-table table {
+    border-collapse: collapse;
+}
+
+.advanced-setting-table thead th,
+.advanced-setting-table tbody td {
+    padding: 0px 10px;
+    position: relative;
+}
+
+.advanced-setting-table tbody tr:has(td input:focus) {
+    background-color: var(--transparent-gray-bg);
+}
+.advanced-setting-table tbody td .show-boolean-value,
+.advanced-setting-table tbody td input {
+    height: 40px;
+    padding: 0px 10px;
+    width: 200px;
+    border: none;
+    background-color: transparent;
+    border-bottom: 1px solid gray;
+    font-size: 15px;
+}
+
+.advanced-setting-table tbody td .show-boolean-value {
+    align-content: center;
+}
+
+.advanced-setting-table tbody td input[type='checkbox'] {
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+}
+
+.advanced-setting-table tr {
+    /* works as margin */
+    border-bottom: 10px solid white;
+}
+
+.advanced-setting-table tbody tr:has(td input:focus) {
+    background-color: var(--transparent-gray-bg);
+}
+
