@@ -3,6 +3,7 @@ import useUser from '../../global/useUser.js';
 import showMessage from '../../tools/message.js';
 import request from '../../tools/request.js';
 import normalSettingSection from './normal-setting-section.js';
+import rangeSettingSection from './range-setting-section.js';
 
 let updateDatasetOptions;
 
@@ -22,7 +23,8 @@ async function updateUserDatasetList() {
     }
 }
 
-let current_conversation = {}, session_settings, name_setter;
+let current_conversation = {}, session_settings, name_setter
+let selected_dataset = '', dataset_ratio = 0.1;
 
 const { rename } = useConversation(c=>{
     if(session_settings) {
@@ -70,27 +72,44 @@ export default function createSessionSettings(main) {
     session_settings.appendChild(rename_elem);
     name_setter = setName;
 
+    session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>")
+
     // eslint-disable-next-line no-unused-vars
-    const [select_dataset_elem, _, updateDatasetVars] = normalSettingSection('select', "Select Dataset For RAG", async dataset_name=>{
-        // TODO: upload dataset selection
-        const { http_error } = await request('ds/load', {
-            method: 'POST',
-            body: {
-                name: dataset_name,
-                des: 'string',
-                ratio: 0
-            }
-        })
-        if(!http_error) {
-            showMessage(dataset_name ? `"${dataset_name}" Selected` : 'Deselect Dataset')
-        } else {
-            showMessage('Upload dataset failed! Please check your network.', { type: 'err' })
-        }
-    }, [{value:'', title: '-- Please select a dataset --'}])
+    const [select_dataset_elem, _, updateDatasetVars] = normalSettingSection('select', "Select Dataset For RAG", 
+        dataset_name=>{
+            selected_dataset = dataset_name;
+        }, [{value:'', title: '-- Please select a dataset --'}]
+    )
     updateDatasetOptions = updateDatasetVars;
     select_dataset_elem.classList.add('rag-option')
     session_settings.appendChild(select_dataset_elem)
     login && updateUserDatasetList();
 
+    const [ ratio_range, setRatioRange ] = rangeSettingSection(
+        'Dataset Ratio', 
+        { max: 1, min: 0.1, is_100_times: true, step: 10 }, 
+        ()=>{ setRatioRange(0.1) }, 
+        value=>{
+            dataset_ratio = value;
+        }
+    );
+    setRatioRange(0.1)
+    ratio_range.classList.add('rag-option')
+    session_settings.appendChild(ratio_range);
+
+    const [submit_dataset_btn, setBtnValue] = normalSettingSection(
+        "button", "Confirm Dataset Options", null,  submitDatasetOptions
+    )
+    setBtnValue('Confirm')
+    submit_dataset_btn.classList.add('rag-option');
+    session_settings.appendChild(submit_dataset_btn)
+
+    session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>")
     main.appendChild(session_settings);
+}
+
+async function submitDatasetOptions() {
+    console.log(selected_dataset, dataset_ratio)
+    showMessage('RAG Options Confirmed')
+    session_settings.classList.add('no-rag')
 }
