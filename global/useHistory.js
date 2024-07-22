@@ -13,17 +13,23 @@ const { onmount, remount, dismount, updateAll } = createHook();
 async function requestUpdateHistory() {
     if(!currentSession) return;
     
-    const chat_history = await request('chat');
+    const response = await request('chat');
+
+    if(!Array.isArray(response)) return;
+    const chat_history = response.map(e=>{return {...e, createdAt: new Date(e.createdAt)}})
+    console.log(chat_history)
+    chat_history.sort((a, b)=>b.createdAt - a.createdAt);
 
     history.length = 0;
     chat_history.forEach(({sessionUuid, name, type, createdAt}) => {
-        history.push({id: sessionUuid, name, type, createdAt});
+        const parsedDate = `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString().padStart(11, '0')}`;
+        history.push({id: sessionUuid, name, type, createdAt: parsedDate});
     });
     updateAll(history);
 }
 
 function addHistory(new_ticket) {
-    history.push(new_ticket);
+    history.unshift(new_ticket);
     updateAll(history);
 }
 
