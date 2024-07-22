@@ -17,7 +17,7 @@ function switchPage(page) {
     if(current_page === page) return;
     switch(page) {
         case 'parameters': 
-            loadParametersPage(training_page_main);
+            loadParametersPage(training_page_main, ()=>switchPage('training-visualization'));
             break;
         case 'faq': 
             loadFAQPage(training_page_main);
