@@ -1,11 +1,9 @@
-import request from "../tools/request.js";
 import createHook from "./createHook.js";
+import request from "../tools/request.js";
 import useSessionId from "./useSessionId.js";
+import formatDateTime from "../tools/formatDateTime.js";
 
-const history = [
-    // {id: 0, name: 'New Conversation', createdAt: new Date().toUTCString()},
-    // {id: 1, name: 'New Conversation', createdAt: new Date().toUTCString()},
-];
+const history = [];
 let currentSession;
 
 const { onmount, remount, dismount, updateAll } = createHook();
@@ -22,8 +20,7 @@ async function requestUpdateHistory() {
 
     history.length = 0;
     chat_history.forEach(({sessionUuid, name, type, createdAt}) => {
-        const parsedDate = `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString().padStart(11, '0')}`;
-        history.push({id: sessionUuid, name, type, createdAt: parsedDate});
+        history.push({id: sessionUuid, name, type, createdAt: formatDateTime(createdAt)});
     });
     updateAll(history);
 }
