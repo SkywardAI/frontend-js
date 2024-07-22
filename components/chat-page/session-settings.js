@@ -1,14 +1,22 @@
 import useConversation from '../../global/useConversation.js';
 import useUser from '../../global/useUser.js';
 import showMessage from '../../tools/message.js';
+import request from '../../tools/request.js';
 // import request from '../../tools/request.js';
 import normalSettingSection from './normal-setting-section.js';
+
+const available_datasets = [
+    {value: 'example/dataset1'},
+    {value: 'example/dataset2'},
+    {value: 'example/dataset3'}
+]
 
 let current_conversation = {}, session_settings, name_setter;
 
 const { rename } = useConversation(c=>{
     if(session_settings) {
         session_settings.classList.toggle('disabled', !c.id)
+        session_settings.classList.toggle('no-rag', c.type === 'chat')
     }
     if(c.name && name_setter && current_conversation.name !== c.name) {
         name_setter(c.name)
@@ -50,9 +58,22 @@ export default function createSessionSettings(main) {
     session_settings.appendChild(rename_elem);
     name_setter = setName;
 
-    const [select_dataset_elem] = normalSettingSection('select', "Select Dataset For RAG", dataset_name=>{
-        dataset_name && showMessage(`"${dataset_name}" Selected`)
-    }, [{value:'', title: '-- Please select a dataset --'}, {value: 'example/dataset1'}, {value: 'example/dataset2'}, {value: 'example/dataset3'}])
+    const [select_dataset_elem] = normalSettingSection('select', "Select Dataset For RAG", async dataset_name=>{
+        // TODO: upload dataset selection
+        const { http_error } = await request('ds/load', {
+            method: 'POST',
+            body: {
+                name: dataset_name,
+                des: 'string',
+                ratio: 0
+            }
+        })
+        if(!http_error) {
+            showMessage(dataset_name ? `"${dataset_name}" Selected` : 'Deselect Dataset')
+        } else {
+            showMessage('Upload dataset failed! Please check your network.', { type: 'err' })
+        }
+    }, [{value:'', title: '-- Please select a dataset --'}, ...available_datasets])
     select_dataset_elem.classList.add('rag-option')
     session_settings.appendChild(select_dataset_elem)
 
