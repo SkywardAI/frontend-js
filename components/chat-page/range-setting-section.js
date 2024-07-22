@@ -16,6 +16,7 @@ export default function rangeSettingSection(title, valueRange, setToDefault, upd
     
     const range = document.createElement('input');
     range.type = 'range';
+    if(valueRange.step) range.step = valueRange.step;
     range.max = max;
     range.min = min;
     
