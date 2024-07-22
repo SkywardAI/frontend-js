@@ -30,9 +30,10 @@ for(const key in settings) setting_value_type[key] = typeof settings[key];
 // TODO: load settings from local
 
 const [ advanced_settings_dialog, controller ] = createDialog();
-let main_form, init = false;
+let main_form, init = false, showTrainingPage;
 
-export default function loadParametersPage(main) {
+export default function loadParametersPage(main, switchPage) {
+    showTrainingPage = switchPage;
     main.innerHTML = `
     <form id='training-params'>
         <section class='token'>
@@ -195,6 +196,8 @@ function getEntryValues() {
 
 function startTraining(evt) {
     evt.preventDefault();
+
+    showTrainingPage();    
 }
 
 function settingValueParser(type, value) {
