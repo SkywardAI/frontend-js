@@ -2,14 +2,25 @@ import useConversation from '../../global/useConversation.js';
 import useUser from '../../global/useUser.js';
 import showMessage from '../../tools/message.js';
 import request from '../../tools/request.js';
-// import request from '../../tools/request.js';
 import normalSettingSection from './normal-setting-section.js';
 
-const available_datasets = [
-    {value: 'example/dataset1'},
-    {value: 'example/dataset2'},
-    {value: 'example/dataset3'}
-]
+let updateDatasetOptions;
+
+async function updateUserDatasetList() {
+    if(!updateDatasetOptions) return;
+    const response = await request('ds/list');
+    if(!Array.isArray(response) && response.http_error) {
+        showMessage('Get user dataset list failed!', { type: 'err' })
+    } else {
+        const available_datasets = response.map(({name})=>{
+            return { value: name }
+        });
+        updateDatasetOptions([
+            {value:'', title: '-- Please select a dataset --'},
+            ...available_datasets
+        ])
+    }
+}
 
 let current_conversation = {}, session_settings, name_setter;
 
@@ -27,6 +38,7 @@ const { rename } = useConversation(c=>{
 let login = false;
 useUser(user=>{
     login = user.id !== null;
+    login && updateUserDatasetList();
     if(session_settings) {
         session_settings.classList.toggle('no-rag', !login)
     }
@@ -58,7 +70,8 @@ export default function createSessionSettings(main) {
     session_settings.appendChild(rename_elem);
     name_setter = setName;
 
-    const [select_dataset_elem] = normalSettingSection('select', "Select Dataset For RAG", async dataset_name=>{
+    // eslint-disable-next-line no-unused-vars
+    const [select_dataset_elem, _, updateDatasetVars] = normalSettingSection('select', "Select Dataset For RAG", async dataset_name=>{
         // TODO: upload dataset selection
         const { http_error } = await request('ds/load', {
             method: 'POST',
@@ -73,9 +86,11 @@ export default function createSessionSettings(main) {
         } else {
             showMessage('Upload dataset failed! Please check your network.', { type: 'err' })
         }
-    }, [{value:'', title: '-- Please select a dataset --'}, ...available_datasets])
+    }, [{value:'', title: '-- Please select a dataset --'}])
+    updateDatasetOptions = updateDatasetVars;
     select_dataset_elem.classList.add('rag-option')
     session_settings.appendChild(select_dataset_elem)
+    login && updateUserDatasetList();
 
     main.appendChild(session_settings);
 }
