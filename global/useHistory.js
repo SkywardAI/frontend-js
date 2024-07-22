@@ -15,7 +15,6 @@ async function requestUpdateHistory() {
 
     if(!Array.isArray(response)) return;
     const chat_history = response.map(e=>{return {...e, createdAt: new Date(e.createdAt)}})
-    console.log(chat_history)
     chat_history.sort((a, b)=>b.createdAt - a.createdAt);
 
     history.length = 0;
