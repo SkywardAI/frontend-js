@@ -31,7 +31,8 @@ export default function normalSettigSection(type, title, callback = null, ...arg
                 input_like.appendChild(option);
             })
         } else if(type === 'button') {
-            input_like.onclick = args[0];
+            input_like.value = args[0];
+            input_like.onclick = args[1];
             input_like.classList.add('clickable')
         }
     }
@@ -45,8 +46,22 @@ export default function normalSettigSection(type, title, callback = null, ...arg
 
     loadArgs();
 
-    function setter(value) {
+    function setValue(value) {
         input_like.value = value;
+    }
+
+    function toggleDisable(is_disabled) {
+        switch(type) {
+            case 'text':
+                input_like.disable = is_disabled;
+                break;
+            case 'button':
+                input_like.onclick = is_disabled ? null : args[1];
+                break;
+            case 'select':
+                input_like.classList.toggle('disabled', is_disabled);
+                break;
+        }
     }
 
     input_like.onchange = () => {
@@ -55,5 +70,5 @@ export default function normalSettigSection(type, title, callback = null, ...arg
 
     section.appendChild(input_like)
 
-    return [section, setter, setArgs];
+    return [section, { setValue, setArgs, toggleDisable }];
 }

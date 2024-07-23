@@ -1,6 +1,6 @@
 import getSVG from "../../tools/svgs.js";
 
-export default function rangeSettingSection(title, valueRange, setToDefault, updateSetting) {
+export default function rangeSettingSection(title, valueRange, setToDefault, updateSetting, initial_value = null) {
 
     const { max, min, from_range, to_range } = rangeValueConverter(valueRange)
 
@@ -26,7 +26,6 @@ export default function rangeSettingSection(title, valueRange, setToDefault, upd
     const restore_default_btn = document.createElement('div');
     restore_default_btn.className = 'restore-default-icon clickable';
     restore_default_btn.innerHTML = getSVG('arrow-counterclockwise');
-    restore_default_btn.onclick = setToDefault;
 
     container.appendChild(range);
     container.appendChild(text);
@@ -61,7 +60,25 @@ export default function rangeSettingSection(title, valueRange, setToDefault, upd
         range.value = to_range(value);
     }
 
-    return [setting_section, setter]
+    function toggleDisable(is_disabled) {
+        text.disabled = is_disabled;
+        range.disabled = is_disabled;
+        restore_default_btn.classList.toggle('disabled', is_disabled)
+        if(is_disabled) {
+            restore_default_btn.onclick = null;
+        } else {
+            restore_default_btn.onclick = setToDefault;
+        }
+    }
+    restore_default_btn.onclick = setToDefault;
+
+    if(initial_value !== null) setter(initial_value);
+
+    if(typeof setToDefault === 'number') {
+        setToDefault = () => setter(setToDefault);
+    }
+
+    return [setting_section, {setter, toggleDisable}]
 }
 
 function rangeValueConverter({ max, min, is_100_times }) {
