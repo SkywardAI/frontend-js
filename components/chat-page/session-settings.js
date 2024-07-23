@@ -163,11 +163,11 @@ const { rename } = useConversation(conversation=>{
 // ===================================================
 
 session_settings.appendChild(rename_session_elem);
-session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>");
+session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option hide-on-no-change'>");
 session_settings.appendChild(dataset_list_elem);
 session_settings.appendChild(dataset_range_elem);
 session_settings.appendChild(submit_dataset_btn);
-session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>");
+session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option hide-on-no-change'>");
 
 // ===================================================
 //
