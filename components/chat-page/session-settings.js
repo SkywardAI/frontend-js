@@ -5,111 +5,176 @@ import request from '../../tools/request.js';
 import normalSettingSection from './normal-setting-section.js';
 import rangeSettingSection from './range-setting-section.js';
 
-let updateDatasetOptions;
+// ===================================================
+//
+//                  Local Variables
+//
+// ===================================================
 
-async function updateUserDatasetList() {
-    if(!updateDatasetOptions) return;
-    const response = await request('ds/list');
-    if(!Array.isArray(response) && response.http_error) {
-        showMessage('Get user dataset list failed!', { type: 'err' })
+let current_conversation = {}, user_id = null;
+let rag_dataset_options = {};
+
+// ===================================================
+//
+//                     Elements
+//
+// ===================================================
+
+const session_settings = document.createElement('div');
+session_settings.className = 'session-settings'
+session_settings.innerHTML = 
+`<div class='title'>Adjust Session Settings</div>
+<div class='sub-title'>* Cannot change RAG settings after session started *</div>`
+
+// ===========================rename============================
+
+const [rename_session_elem, {
+    setValue:setSessionName
+}] = normalSettingSection('text', 'Rename Session', new_name=>{
+    const old_name = current_conversation.name;
+    if(!new_name) {
+        setSessionName(old_name)
+    } else if(new_name === old_name) {
+        return;
     } else {
-        const available_datasets = response.map(({name})=>{
-            return { value: name }
-        });
-        updateDatasetOptions([
-            {value:'', title: '-- Please select a dataset --'},
-            ...available_datasets
-        ])
-    }
-}
-
-let current_conversation = {}, session_settings, name_setter
-let selected_dataset = '', dataset_ratio = 0.1;
-
-const { rename } = useConversation(c=>{
-    if(session_settings) {
-        session_settings.classList.toggle('disabled', !c.id)
-        session_settings.classList.toggle('no-rag', c.type === 'chat')
-    }
-    if(c.name && name_setter && current_conversation.name !== c.name) {
-        name_setter(c.name)
-    }
-    current_conversation = c;
-});
-
-let login = false;
-useUser(user=>{
-    login = user.id !== null;
-    login && updateUserDatasetList();
-    if(session_settings) {
-        session_settings.classList.toggle('no-rag', !login)
+        rename(new_name).then(success=>{
+            const strong_name = document.createElement('strong');
+            strong_name.textContent = new_name;
+            if(success) showMessage([`Session renamed to`, document.createElement('br'), strong_name], { type: 'success' });
+            else showMessage('Rename session failed!', { type: 'err' })
+        })
     }
 })
 
-export default function createSessionSettings(main) {
-    session_settings = document.createElement('div');
-    session_settings.className = 'session-settings disabled'
-    if(!login) session_settings.classList.add('no-rag')
-    session_settings.innerHTML = `
-    <div class='title'>Adjust Session Settings</div>
-    <div class='sub-title'>* Cannot change RAG settings after session started *</div>
-    `
+// ===========================list============================
 
-    const [rename_elem, setName] = normalSettingSection('text', 'Rename Session', new_name=>{
-        if(!new_name) {
-            setName(current_conversation.name)
-        } else if(new_name === current_conversation.name) {
-            return;
-        } else {
-            rename(new_name).then(success=>{
-                const strong_name = document.createElement('strong');
-                strong_name.textContent = new_name;
-                if(success) showMessage([`Session renamed to`, document.createElement('br'), strong_name], { type: 'success' });
-                else showMessage('Rename session failed!', { type: 'err' })
-            })
-        }
-    })
-    session_settings.appendChild(rename_elem);
-    name_setter = setName;
+const [dataset_list_elem, {
+    setValue:setSelectedDataset,
+    setArgs:setDatasetList,
+    toggleDisable:toggleDatasetListDisable 
+}] = normalSettingSection('select', 'Select Dataset For RAG', select=>{
+    rag_dataset_options.dataset_name = select;
+}, [])
+dataset_list_elem.classList.add('rag-option')
 
-    session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>")
+// ===========================range============================
 
-    // eslint-disable-next-line no-unused-vars
-    const [select_dataset_elem, _, updateDatasetVars] = normalSettingSection('select', "Select Dataset For RAG", 
-        dataset_name=>{
-            selected_dataset = dataset_name;
-        }, [{value:'', title: '-- Please select a dataset --'}]
-    )
-    updateDatasetOptions = updateDatasetVars;
-    select_dataset_elem.classList.add('rag-option')
-    session_settings.appendChild(select_dataset_elem)
-    login && updateUserDatasetList();
+const [dataset_range_elem, {
+    toggleDisable:toggleDatasetRangeDisable
+}] = rangeSettingSection('Dataset Ratio',
+    { max: 1, min: 0.1, is_100_times: true, step: 10 },
+    0.1, 
+    ratio => {
+        rag_dataset_options.ratio = ratio;
+    },
+    0.1
+)
+dataset_range_elem.classList.add('rag-option','hide-on-no-change')
 
-    const [ ratio_range, setRatioRange ] = rangeSettingSection(
-        'Dataset Ratio', 
-        { max: 1, min: 0.1, is_100_times: true, step: 10 }, 
-        ()=>{ setRatioRange(0.1) }, 
-        value=>{
-            dataset_ratio = value;
-        }
-    );
-    setRatioRange(0.1)
-    ratio_range.classList.add('rag-option')
-    session_settings.appendChild(ratio_range);
+// ===========================submit============================
 
-    const [submit_dataset_btn, setBtnValue] = normalSettingSection(
-        "button", "Confirm Dataset Options", null,  submitDatasetOptions
-    )
-    setBtnValue('Confirm')
-    submit_dataset_btn.classList.add('rag-option');
-    session_settings.appendChild(submit_dataset_btn)
+const [submit_dataset_btn, {
+    toggleDisable:toggleSubmitButtonDisable
+}] = normalSettingSection(
+    'button', 'Confirm Dataset Options', ()=>{}, 
+    'Confirm', submitDatasetOptions
+)
+submit_dataset_btn.classList.add('rag-option','hide-on-no-change')
 
-    session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>")
-    main.appendChild(session_settings);
+// ===================================================
+//
+//                      Functions
+//
+// ===================================================
+
+function toggleRAGOptionsStatus(status) {
+    // because we want to pass is_disabled which is oppsite to "status"
+    status = !status;
+    
+    toggleDatasetListDisable(status);
+    toggleDatasetRangeDisable(status);
+    toggleSubmitButtonDisable(status);
 }
 
 async function submitDatasetOptions() {
-    console.log(selected_dataset, dataset_ratio)
+    // TODO: send update according to sessionuuid
+    
+    // This normally should not happen but here's a little backup
+    if(user_id === null) return;
+    session_settings.classList.add('no-rag-change');
+    toggleRAGOptionsStatus(false);
     showMessage('RAG Options Confirmed')
-    session_settings.classList.add('no-rag')
+}
+
+async function updateUserDatasetList(list = []) {
+    setDatasetList([
+        {value:'', title: '-- Please select a dataset --'},
+        {value:'example/test-dataset-1'},
+        {value:'example/test-dataset-2'},
+        ...list
+    ])
+}
+
+// ===================================================
+//
+//                  Global Variables
+//
+// ===================================================
+
+useUser(user=>{
+    user_id = user.id;
+    if(user_id !== null) {
+        request('ds/list').then(response=>{
+            if(!Array.isArray(response) && response.http_error) {
+                showMessage('Get user dataset list failed!', { type: 'err' })
+                updateUserDatasetList();
+            } else {
+                updateUserDatasetList(response);
+            }
+        })
+    }
+})
+
+const { rename } = useConversation(conversation=>{
+    current_conversation = conversation;
+    setSessionName(conversation.name)
+    session_settings.classList.toggle(
+        'disabled',
+        conversation.id === null
+    );
+    session_settings.classList.toggle(
+        'no-rag',
+        conversation.type === 'chat' || user_id === null
+    );
+
+    const dataset_set_done = !!conversation.dataset_name;
+    session_settings.classList.toggle(
+        'no-rag-change',
+        dataset_set_done
+    )
+    setSelectedDataset(conversation.dataset_name || '');
+    toggleRAGOptionsStatus(!dataset_set_done);
+})
+
+// ===================================================
+//
+//                      Others
+//
+// ===================================================
+
+session_settings.appendChild(rename_session_elem);
+session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>");
+session_settings.appendChild(dataset_list_elem);
+session_settings.appendChild(dataset_range_elem);
+session_settings.appendChild(submit_dataset_btn);
+session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option'>");
+
+// ===================================================
+//
+//                       Entry
+//
+// ===================================================
+
+export default function createSessionSettings(main) {
+    main.appendChild(session_settings);
 }
