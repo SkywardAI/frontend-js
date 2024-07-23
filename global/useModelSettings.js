@@ -13,8 +13,8 @@ const savedSettings = localStorage.getItem('model-settings') ?
 JSON.parse(localStorage.getItem('model-settings')) : {};
 
 let currentSettings = {
-    ...savedSettings,
-    ...defaultSettings
+    ...defaultSettings,
+    ...savedSettings
 }
 
 const writeSettingsToLocal = debounce(()=>{
