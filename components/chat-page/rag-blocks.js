@@ -19,7 +19,7 @@ async function updateRAG(mode, element, id) {
             method: 'PATCH',
             body: {
                 sessionUuid: id,
-                type: 'rag'
+                session_type: 'rag'
             }
         })
         if(http_error) {
@@ -38,12 +38,12 @@ async function updateRAG(mode, element, id) {
 }
 
 export default function createRAGSelector(conversation) {
-    if(conversation.type || user_id === null) {
+    if(conversation.session_type || user_id === null) {
         const rag_info = document.createElement('div');
         rag_info.className = 'greeting rag-info';
         rag_info.innerHTML = `RAG <strong>${
-            conversation.type === 'rag' ? 'ON' :
-            conversation.type === 'chat' || user_id === null ? 'OFF' : ''
+            conversation.session_type === 'rag' ? 'ON' :
+            conversation.session_type === 'chat' || user_id === null ? 'OFF' : ''
         }</strong>`
         return rag_info;
     }
