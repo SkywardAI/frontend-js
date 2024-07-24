@@ -55,7 +55,6 @@ function updateHistoryList() {
     tickets_list.className='tickets-list'
 
     history.forEach(({id, name, session_type, dataset_name, createdAt}) => {
-        console.log(dataset_name)
         const ticket = document.createElement('div')
         ticket.className = 'ticket clickable'
         id === last_selected_id && ticket.classList.add('selected')
