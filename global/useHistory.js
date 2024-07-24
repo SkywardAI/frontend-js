@@ -18,8 +18,17 @@ async function requestUpdateHistory() {
     chat_history.sort((a, b)=>b.createdAt - a.createdAt);
 
     history.length = 0;
-    chat_history.forEach(({sessionUuid, name, type, createdAt}) => {
-        history.push({id: sessionUuid, name, type, createdAt: formatDateTime(createdAt)});
+    chat_history.forEach(({
+        sessionUuid, name, 
+        sessionType:session_type, 
+        datasetName:dataset_name, 
+        createdAt
+    }) => {
+        history.push({
+            id: sessionUuid, name, 
+            session_type, dataset_name, 
+            createdAt: formatDateTime(createdAt)
+        });
     });
     updateAll(history);
 }
@@ -40,6 +49,11 @@ async function updateHistoryName(id, name) {
     return success;
 }
 
+function updateHistoryInfo(id, key, value) {
+    history[history.findIndex(h=>h.id === id)][key] = value;
+    updateAll(history)
+}
+
 function getHistory(id) {
     return history.filter(e=>e.id === id).pop();
 }
@@ -58,7 +72,7 @@ export default function useHistory(updated = null) {
     updated && updated(history);
 
     return { 
-        requestUpdateHistory, addHistory, getHistory, updateHistoryName,
+        requestUpdateHistory, addHistory, getHistory, updateHistoryName, updateHistoryInfo,
         componetDismount: dismount(mount_key), componentReMount
     }
 }
