@@ -238,6 +238,7 @@ function getEntryValues() {
 
 }
 
+
 function startTraining() {
     const values = getEntryValues();
     console.log(values);
