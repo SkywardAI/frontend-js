@@ -1,4 +1,5 @@
 import useConversation from '../../global/useConversation.js';
+import useHistory from '../../global/useHistory.js';
 import useUser from '../../global/useUser.js';
 import createDialog from '../../tools/dialog.js';
 import showMessage from '../../tools/message.js';
@@ -68,17 +69,19 @@ dataset_list_elem.classList.add('rag-option')
 
 // ===========================range============================
 
+const default_ratio = 0.1
 const [dataset_range_elem, {
     toggleDisable:toggleDatasetRangeDisable
 }] = rangeSettingSection('Dataset Ratio',
     { max: 1, min: 0.1, is_100_times: true, step: 10 },
-    0.1, 
+    default_ratio, 
     ratio => {
         rag_dataset_options.ratio = ratio;
     },
-    0.1
+    default_ratio
 )
 dataset_range_elem.classList.add('rag-option','hide-on-no-change')
+rag_dataset_options.ratio = default_ratio;
 
 // ===========================submit============================
 
@@ -119,6 +122,7 @@ async function submitDatasetOptions() {
             ...rag_dataset_options
         }
     })
+    updateHistoryInfo(current_conversation.id, 'dataset_name', rag_dataset_options.dataset_name);
     upload_dataset_cover_controller.close();
 
     if(http_error) {
@@ -154,11 +158,13 @@ useUser(user=>{
                 showMessage('Get user dataset list failed!', { type: 'err' })
                 updateUserDatasetList();
             } else {
-                updateUserDatasetList(response.map(e=>{return {value: e.name}}));
+                updateUserDatasetList(response.map(e=>{return {value: e.datasetName}}));
             }
         })
     }
 })
+
+const { updateHistoryInfo } = useHistory();
 
 const { rename } = useConversation(conversation=>{
     current_conversation = conversation;
@@ -169,7 +175,9 @@ const { rename } = useConversation(conversation=>{
     );
     session_settings.classList.toggle(
         'no-rag',
-        conversation.session_type === 'chat' || user_id === null
+        !conversation.session_type ||
+        conversation.session_type === 'chat' || 
+        user_id === null
     );
 
     const dataset_set_done = !!conversation.dataset_name;
