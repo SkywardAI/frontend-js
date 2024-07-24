@@ -269,6 +269,7 @@
 
 #conversation-main .conversation-block .message {
     font-size: 18px;
+    width: 100%;
 }
 
 #conversation-main .conversation-block.sender-user .message {
