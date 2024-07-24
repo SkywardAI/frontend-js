@@ -1,3 +1,18 @@
+function createElement(tagName, textContent = '', args = {}) {
+    const elem = document.createElement(tagName);
+    if(textContent) elem.textContent = textContent;
+    const { appendChild, ...html_element_args } = args;
+
+    if(appendChild) {
+        elem.appendChild(appendChild);
+    }
+
+    for(const key in html_element_args) {
+        elem[key] = args[key];
+    }
+    return elem;
+}
+
 export function formatMarkdown(str, target_elem, pending_elem, end_special_block = null, force = false) {
     if(!str.includes('\n') && !force) {
         pending_elem.textContent = str;
@@ -7,28 +22,37 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
     let content_left = ''
     if(!force) content_left = whole_lines.pop();
     pending_elem.textContent = content_left;
-    const inline_codes = [];
-
-    function addInlineCode(content) {
-        const code_span = document.createElement('span');
-        code_span.className = 'inline-code';
-        code_span.textContent = content;
-        inline_codes.push(code_span)
-    }
+    const plain_text_elems = [];
 
     function parseSingleLine(pattern_name) {
         return (_, group_1, group_2) => {
             switch(pattern_name) {
                 case 'header':
-                    return `<h${group_1.length}>${group_2}</h${group_1.length}>`;
-                case 'bold': return `<strong>${group_1}</strong>`;
-                case 'italic': return `<em>${group_1}</em>`;
-                case 'bold-italic': return `<em><strong>${group_1}</strong></em>`;
-                case 'hr': return '</hr>';
+                    plain_text_elems.push(createElement(`h${group_1.length}`, group_2));
+                    break;
+                case 'bold': 
+                    plain_text_elems.push(createElement(`strong`, group_1));
+                    break;
+                case 'italic': 
+                    plain_text_elems.push(createElement(`em`, group_1));
+                    break;
+                case 'bold-italic': 
+                    plain_text_elems.push(
+                        createElement(`em`, '', {
+                            appendChild: createElement('strong', group_1)
+                        })
+                    );
+                    break;
+                case 'hr': 
+                    plain_text_elems.push(createElement('hr'))
+                    break;
                 case 'inline-code': 
-                    addInlineCode(group_1 || group_2)
-                    return `<|SPLIT_BY_INLINE_CODE|>`;
+                    plain_text_elems.push(createElement('span', group_1 || group_2, { className: 'inline-code' }))
+                    break;
+                default:
+                    return '';
             }
+            return `<|SPLIT_BY_INLINE_CODE|>`;
         }
     }
 
@@ -73,19 +97,20 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
 
             const block = document.createElement('div');
             block.className = 'single-line';
-            if(inline_codes.length) {
+            if(plain_text_elems.length) {
                 const elems_to_append = [];
                 const text_elements = parsed_line.split('<|SPLIT_BY_INLINE_CODE|>')
                 while(text_elements.length) {
                     elems_to_append.push(text_elements.shift());
-                    elems_to_append.push(inline_codes.shift() || '');
+                    elems_to_append.push(plain_text_elems.shift() || '');
                 }
-                for(const i of elems_to_append) {
-                    if(typeof i === 'string') block.insertAdjacentHTML("beforeend", i);
-                    else if(i instanceof HTMLElement) block.appendChild(i);
-                }
+                // for(const i of elems_to_append) {
+                //     if(typeof i === 'string') block.insertAdjacentHTML("beforeend", i);
+                //     else if(i instanceof HTMLElement) block.appendChild(i);
+                // }
+                block.append(...elems_to_append);
             } else {
-                block.innerHTML = parsed_line;
+                block.textContent = parsed_line;
             }
             pending_elem.insertAdjacentElement("beforebegin", block);
         }
