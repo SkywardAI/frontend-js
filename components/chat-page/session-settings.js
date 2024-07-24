@@ -1,7 +1,9 @@
 import useConversation from '../../global/useConversation.js';
 import useUser from '../../global/useUser.js';
+import createDialog from '../../tools/dialog.js';
 import showMessage from '../../tools/message.js';
 import request from '../../tools/request.js';
+import getSVG from '../../tools/svgs.js';
 import normalSettingSection from './normal-setting-section.js';
 import rangeSettingSection from './range-setting-section.js';
 
@@ -19,6 +21,13 @@ let rag_dataset_options = {};
 //                     Elements
 //
 // ===================================================
+
+const [upload_dataset_cover, upload_dataset_cover_controller] = createDialog(false);
+const show_dataset_loading = document.createElement('div');
+show_dataset_loading.className = 'show-dataset-loading';
+show_dataset_loading.innerHTML = 
+`${getSVG('arrow-clockwise')}<div>Dataset loading, please wait...</div>`
+upload_dataset_cover.appendChild(show_dataset_loading);
 
 const session_settings = document.createElement('div');
 session_settings.className = 'session-settings'
@@ -97,7 +106,25 @@ function toggleRAGOptionsStatus(status) {
 }
 
 async function submitDatasetOptions() {
-    // TODO: send update according to sessionuuid
+    if(!rag_dataset_options.dataset_name) {
+        showMessage('Please select a dataset to upload!', { type: 'err' });
+        return;
+    }
+    upload_dataset_cover_controller.showModal();
+    const { http_error } = await request('ds/load', {
+        method: 'POST',
+        body: {
+            sessionUuid: current_conversation.id,
+            des: "description",
+            ...rag_dataset_options
+        }
+    })
+    upload_dataset_cover_controller.close();
+
+    if(http_error) {
+        showMessage("Confirm dataset options failed!", { type: 'err' });
+        return;
+    }
     
     // This normally should not happen but here's a little backup
     if(user_id === null) return;
@@ -109,8 +136,6 @@ async function submitDatasetOptions() {
 async function updateUserDatasetList(list = []) {
     setDatasetList([
         {value:'', title: '-- Please select a dataset --'},
-        {value:'example/test-dataset-1'},
-        {value:'example/test-dataset-2'},
         ...list
     ])
 }
@@ -129,7 +154,7 @@ useUser(user=>{
                 showMessage('Get user dataset list failed!', { type: 'err' })
                 updateUserDatasetList();
             } else {
-                updateUserDatasetList(response);
+                updateUserDatasetList(response.map(e=>{return {value: e.name}}));
             }
         })
     }
@@ -144,7 +169,7 @@ const { rename } = useConversation(conversation=>{
     );
     session_settings.classList.toggle(
         'no-rag',
-        conversation.session_type === 'chat' || user_id === null
+        conversation.sessionType === 'chat' || user_id === null
     );
 
     const dataset_set_done = !!conversation.dataset_name;
