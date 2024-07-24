@@ -8,7 +8,7 @@ import getSVG from "../../tools/svgs.js";
 import createRAGSelector from "./rag-blocks.js";
 
 let conversation = {pending: false}, model_settings = {}, 
-    main_elem, toggle_expand,
+    main_elem, toggle_expand, open_settings_page,
     stream_response=true, download_conversation_icon;
 
 let abort_controller;
@@ -83,6 +83,7 @@ export default function createChatMain(main, toggleExpand, openModelSetting) {
     </div>`)
 
     toggle_expand = toggleExpand;
+    open_settings_page = openModelSetting;
     document.getElementById('submit-chat').onsubmit=submitContent;
     main_elem = document.getElementById('conversation-main');
     document.getElementById('toggle-sidebar-expand').onclick = toggle_expand;
@@ -256,7 +257,7 @@ function updateConversation() {
     if(!conversation.history) return;
     if(!conversation.history.length && main_elem) {
         main_elem.innerHTML = "<div class='greeting start-session'>Hi, how can I help you today?</div>"
-        main_elem.appendChild(createRAGSelector(conversation))
+        main_elem.appendChild(createRAGSelector(open_settings_page))
         return;
     }
 
