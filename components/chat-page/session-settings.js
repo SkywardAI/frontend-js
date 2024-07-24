@@ -169,7 +169,7 @@ const { rename } = useConversation(conversation=>{
     );
     session_settings.classList.toggle(
         'no-rag',
-        conversation.sessionType === 'chat' || user_id === null
+        conversation.session_type === 'chat' || user_id === null
     );
 
     const dataset_set_done = !!conversation.dataset_name;
