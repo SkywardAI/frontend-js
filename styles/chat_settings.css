@@ -13,8 +13,9 @@
     border-radius: 10px;
 }
 
+.chat-settings .session-settings.disabled,
 .chat-settings .session-settings.no-rag .rag-option,
-.chat-settings .session-settings.disabled {
+.chat-settings .session-settings.no-rag-change .hide-on-no-change {
     display: none;
 }
 
@@ -50,6 +51,7 @@
 }
 
 .chat-settings .setting-section input[type="text"],
+.chat-settings .setting-section input[type="button"],
 .chat-settings .setting-section select {
     height: var(--input-height);
     border-radius: 5px;
@@ -59,10 +61,31 @@
     background-color: white;
 }
 
+.chat-settings .setting-section input[type="button"] {
+    color: white;
+    background-color: dodgerblue;
+    border: none;
+    font-size: 16px;
+    transition-duration: .3s;
+}
+.chat-settings .setting-section input[type="button"]:hover {
+    background-color: rgb(0, 113, 226);
+}
+
 .chat-settings .setting-section input[type="text"]:focus,
 .chat-settings .setting-section select:focus {
     outline: none;
     border-width: 2px;
+}
+
+.chat-settings .setting-section select.disabled,
+.chat-settings .setting-section input[type="text"]:disabled {
+    border-color: gray;
+    color: gray;
+}
+
+.chat-settings .setting-section select.disabled {
+    pointer-events: none;
 }
 
 .chat-settings .setting-section .combined-section {
@@ -92,6 +115,12 @@
     width: var(--restore-default-icon-size);
     height: var(--restore-default-icon-size);
     color: dodgerblue;
+}
+.chat-settings .setting-section .combined-section.range .restore-default-icon.disabled {
+    color: gray;
+}
+.chat-settings .setting-section .combined-section.range .restore-default-icon.disabled:hover {
+    cursor: default;
 }
 .chat-settings .setting-section .combined-section.range .restore-default-icon svg {
     width: 100%;
@@ -124,4 +153,26 @@
     padding: 0px 20px;
     overflow: hidden;
     color: gray;
+}
+
+.show-dataset-loading {
+    position: relative;
+    padding: 30px;
+    margin: auto;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    margin-top: 35vh;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    user-select: none;
+}
+
+.show-dataset-loading > svg {
+    display: block;
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+    animation: rotateLoading 1s linear infinite;
 }

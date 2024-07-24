@@ -1,6 +1,8 @@
 import request from "../../tools/request.js";
 import showMessage from "../../tools/message.js";
 import useUser from "../../global/useUser.js";
+import useHistory from "../../global/useHistory.js";
+import useConversation from "../../global/useConversation.js";
 
 const rag_modes = [
     { mode: 'on' },
@@ -8,18 +10,23 @@ const rag_modes = [
     { mode: 'hybrid', disabled: true },
 ]
 
-let user_id = null;
+let user_id = null, conversation = {};
 useUser(user=>{
     user_id = user.id;
 })
 
-async function updateRAG(mode, element, id) {
+const { updateHistoryInfo } = useHistory();
+const { updateConversationInfo } = useConversation(c=>{
+    conversation = c;
+})
+
+async function updateRAG(mode, element, id, expand_setting) {
     if(mode === 'on') {
         const { http_error } = await request('chat/session', {
             method: 'PATCH',
             body: {
                 sessionUuid: id,
-                type: 'rag'
+                session_type: 'rag'
             }
         })
         if(http_error) {
@@ -28,6 +35,7 @@ async function updateRAG(mode, element, id) {
         }
     }
     showMessage(`This session will start with RAG ${mode}`);
+    updateHistoryInfo(id, 'session_type', 'chat');
     element.classList.add('completed');
     await new Promise(s=>setTimeout(s, 1000));
     element.insertAdjacentHTML(
@@ -35,15 +43,22 @@ async function updateRAG(mode, element, id) {
         `<div class='greeting rag-info'>RAG <strong>${mode.toUpperCase()}</strong></div>`
     )
     element.remove();
+    if(mode == 'on') {
+        await new Promise(s=>setTimeout(s, 600));
+        updateHistoryInfo(id, 'session_type', 'rag');
+        updateConversationInfo('session_type', 'rag');
+        showMessage("Please set your dataset for RAG");
+        expand_setting();
+    }
 }
 
-export default function createRAGSelector(conversation) {
-    if(conversation.type || user_id === null) {
+export default function createRAGSelector(expand_setting) {
+    if(conversation.session_type || user_id === null) {
         const rag_info = document.createElement('div');
         rag_info.className = 'greeting rag-info';
         rag_info.innerHTML = `RAG <strong>${
-            conversation.type === 'rag' ? 'ON' :
-            conversation.type === 'chat' || user_id === null ? 'OFF' : ''
+            conversation.session_type === 'rag' ? 'ON' :
+            conversation.session_type === 'chat' || user_id === null ? 'OFF' : ''
         }</strong>`
         return rag_info;
     }
@@ -58,7 +73,7 @@ export default function createRAGSelector(conversation) {
         } else {
             option.classList.add('clickable')
             option.onclick = () => {
-                updateRAG(mode, rag_select, conversation.id)
+                updateRAG(mode, rag_select, conversation.id, expand_setting)
             };
         }
         option.innerHTML = `Start session with RAG <strong>${mode}</strong>`;

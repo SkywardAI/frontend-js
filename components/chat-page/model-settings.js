@@ -24,7 +24,7 @@ export default function createModelSettings(main) {
 
     for(const key in fields) {
         const { title, valueRange } = fields[key];
-        const [component, setter] = rangeSettingSection(
+        const [component, {setter}] = rangeSettingSection(
             title, valueRange,
             () => { setToDefault(key) && loadSettings() },
             value=>updateModelSettings(key, value)
