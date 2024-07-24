@@ -54,8 +54,8 @@ function updateHistoryList() {
     const tickets_list = document.createElement('div')
     tickets_list.className='tickets-list'
 
-    // TODO: remove type:
-    history.forEach(({id, name, type:session_type, createdAt}) => {
+    history.forEach(({id, name, session_type, dataset_name, createdAt}) => {
+        console.log(dataset_name)
         const ticket = document.createElement('div')
         ticket.className = 'ticket clickable'
         id === last_selected_id && ticket.classList.add('selected')
@@ -65,7 +65,7 @@ function updateHistoryList() {
         <div class='datetime'>${createdAt}</div>`
 
         ticket.onclick = () => {
-            selectConversation(id, name, session_type);
+            selectConversation(id, name, session_type, dataset_name);
         }
 
         tickets_list.appendChild(ticket)

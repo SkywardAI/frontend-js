@@ -8,6 +8,7 @@ let currentConversation = {
     pending: false,
     name: '',
     session_type: '',
+    dataset_name: '',
     history: []
 };
 
@@ -39,7 +40,7 @@ async function rename(name) {
 }
 
 async function startNewConversation() {
-    storeHistory();
+    !currentUser.logged_in && storeHistory();
     const { sessionUuid } = await request('chat/seesionuuid');
     currentConversation = {
         pending: false, id: sessionUuid, 
@@ -70,7 +71,7 @@ async function sendMessage(messages) {
     updateAll(currentConversation);
 }
 
-async function selectConversation(id, name, session_type) {
+async function selectConversation(id, name, session_type, dataset_name) {
     let history;
     if(currentUser.logged_in) {
         history = await request(`chat/history/${id}`);
@@ -78,7 +79,12 @@ async function selectConversation(id, name, session_type) {
         storeHistory();
         history = conversation_histories[id];
     }
-    currentConversation = { id, history, pending: false, name, session_type };
+    currentConversation = { id, history, pending: false, name, session_type, dataset_name };
+    updateAll(currentConversation);
+}
+
+function updateConversationInfo(key, value) {
+    currentConversation[key] = value;
     updateAll(currentConversation);
 }
 
@@ -93,7 +99,7 @@ export default function useConversation(updated) {
 
     return { 
         selectConversation, startNewConversation,
-        sendMessage, togglePending, rename,
+        sendMessage, togglePending, rename, updateConversationInfo,
         componetDismount:dismount(mount_key), componentReMount
     }
 }
