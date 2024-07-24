@@ -27,6 +27,14 @@ const settings = {
 const setting_value_type = {};
 for(const key in settings) setting_value_type[key] = typeof settings[key];
 
+const quick_edit = [
+    "per_device_eval_batch_size",
+    "gradient_accumulation_steps",
+    "per_device_train_batch_size",
+    "optim",
+    "do_eval"
+]
+
 // TODO: load settings from local
 
 const [ advanced_settings_dialog, controller ] = createDialog();
@@ -61,32 +69,6 @@ export default function loadParametersPage(main, switchPage) {
             </div>
         </section>
         <section class='params'>
-            <div>
-                <div class='title'>Some Random Setting 1</div>
-                <select class='clickable' name='random-setting-1'>
-                    <option value='default option'>Default Option</option>
-                </select>
-            </div>
-            <div>
-                <div class='title'>Some Random Setting 2</div>
-                <input type='text'>
-            </div>
-            <div>
-                <div class='title'>Some Random Setting 3</div>
-                <input type='text'>
-            </div>
-            <div>
-                <div class='title'>Some Random Setting 4</div>
-                <select class='clickable' name='random-setting-1'>
-                    <option value='option 1'>Option 1</option>
-                    <option value='option 2'>Option 2</option>
-                    <option value='option 3'>Option 3</option>
-                </select>
-            </div>
-            <div>
-                <div class='title'>Some Random Setting 5</div>
-                <input type='text'>
-            </div>
             <div id='advanced-setting' class='advanced clickable'>
                 <div class='title'>Advanced Settings</div>
             </div>
@@ -104,10 +86,68 @@ export default function loadParametersPage(main, switchPage) {
         console.log(getEntryValues());
     }
 
+    const params_section = document.querySelector('section.params');
+    quick_edit.forEach(e=>{
+        params_section.insertAdjacentElement("afterbegin", createQuickEditElement(e))
+    })
+
     createAdvancedSettingPage();
     document.getElementById('advanced-setting').onclick = controller.showModal;
 
     return null;
+}
+
+function createQuickEditElement(name) {
+    const type = setting_value_type[name];
+    
+    const block = document.createElement('div');
+    block.innerHTML = `<div class='title'>${name}</div>`
+
+    if(type === 'boolean') {
+        const true_false = document.createElement('div')
+        true_false.className = 'true-false';
+        
+        const selector = document.createElement('div');
+        selector.className = 'selector';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `params-section-${name}`;
+        checkbox.checked = settings[name]
+
+        selector.appendChild(checkbox);
+        
+        true_false.insertAdjacentHTML('beforeend', "<div class='value'>False</div>")
+        true_false.appendChild(selector);
+        true_false.insertAdjacentHTML('beforeend', "<div class='value'>True</div>")
+
+        block.appendChild(true_false)
+
+        checkbox.onchange = evt => {
+            const value = evt.target.checked;
+            settings[name] = value;
+            showMessage(`"${name}" set to ${value}`);
+            document.getElementById(`advanced-section-${name}`).checked = value;
+        }
+    } else {
+        const edit_var = document.createElement('input');
+        edit_var.type = 'text';
+        edit_var.id = `params-section-${name}`
+        edit_var.value = settings[name]
+        edit_var.onchange = () => {
+            const value = settingValueParser(type, edit_var.value)
+            if(value === null) {
+                showMessage(`The entry "${name}" must be type of ${type}!`, { type:'warn' })
+                edit_var.value = settings[name]
+            } else {
+                document.getElementById(`advanced-section-${name}`).value = value;
+                settings[name] = value;
+                showMessage(`"${name}" set to ${value}`);
+            }
+        }
+        block.appendChild(edit_var)
+    }
+    return block;
 }
 
 function createAdvancedSettingPage() {
@@ -149,21 +189,22 @@ function createAdvancedSettingRow(type, key, value) {
     if(type === 'boolean') {
         const show_value = document.createElement('div');
         show_value.className = 'show-boolean-value';
-        show_value.textContent = value;
 
         input.type = 'checkbox';
         input.className = 'clickable'
         input.checked = value;
+        input.id = `advanced-section-${key}`
         input.onchange = evt => {
             const value = evt.target.checked;
-            show_value.textContent = value;
             settings[key] = value;
             showMessage(`"${key}" set to ${value}`);
+            document.getElementById(`params-section-${key}`).checked = value;
         }
         column.appendChild(show_value);
     } else {
         input.type = 'text';
         input.value = value;
+        input.id = `advanced-section-${key}`
         input.onchange = evt => {
             const value = settingValueParser(type, evt.target.value);
             if(value === null) {
@@ -173,6 +214,9 @@ function createAdvancedSettingRow(type, key, value) {
             }
             settings[key] = value;
             evt.target.value = value;
+            if(quick_edit.includes(key)) {
+                document.getElementById(`params-section-${key}`).value = value;
+            }
             showMessage(`"${key}" set to ${value}`);
         }
     }
