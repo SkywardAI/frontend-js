@@ -75,12 +75,12 @@ export default function loadParametersPage(main, switchPage) {
         </section>
         <section class='function'>
             <button class='clickable' type='button' id='save-btn'>Save</button>
-            <button class='clickable' type='submit'>Start Training</button>
+            <button class='clickable' type='button' id='start-training-btn'>Start Training</button>
         </section>
     </form>`
 
     main_form = document.getElementById('training-params');
-    main_form.onsubmit = startTraining;
+    document.getElementById('start-training-btn').onclick = startTraining;
 
     document.getElementById('save-btn').onclick = () => {
         console.log(getEntryValues());
@@ -238,10 +238,10 @@ function getEntryValues() {
 
 }
 
-function startTraining(evt) {
-    evt.preventDefault();
-
-    showTrainingPage();    
+function startTraining() {
+    const values = getEntryValues();
+    console.log(values);
+    showTrainingPage();
 }
 
 function settingValueParser(type, value) {
