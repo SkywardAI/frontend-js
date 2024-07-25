@@ -1,18 +1,39 @@
 import debounce from '../../tools/debounce.js';
 import getSVG from '../../tools/svgs.js'
+import createDialog from '../../tools/dialog.js'
+import request from '../../tools/request.js'
+import showMessage from '../../tools/message.js';
 
-const templates = [
-    { name: 'template 1', description: 'this is description' },
-    { name: 'template 2', description: 'this is description' },
+let templates = [
+    // { name: 'template 1', description: 'this is description', parts: [{function_name: 'linear', param: ''},{function_name: 'linear', param: ''}] },
+    // { name: 'template 2', description: 'this is description', parts: [{function_name: 'linear', param: ''},{function_name: 'linear', param: ''}] },
 ]
 
 let display_templates, card_width = 0, move_length = 0, current_position = 'first';
+let updateSelectedTemplate;
 
-export default function createModelHeroPage() {
-    const main = document.getElementById('main');
+const [selected_template_popup, selected_template_controller] = createDialog();
+
+export default async function createModelHeroPage(
+    main = null, existed_templates = null, selectTemplate = null
+) {
+    main = main || document.getElementById('main');
+
+    if(!existed_templates) {
+        const response = await request('nn/list');
+        if(!Array.isArray(response) && response.http_error) {
+            showMessage('Update model list failed!', { type: 'err' });
+            return;
+        }
+        templates = response;
+    }
+    else templates = existed_templates;
+
+    updateSelectedTemplate = selectTemplate;
+
     main.innerHTML = `
     <div class='model-hero'>
-        <div class='title'>Model Hero Templates</div>
+        <div class='title'>Find Model Templates</div>
         <form id='search-template'>
             <input 
                 type='text' name='search' 
@@ -26,15 +47,7 @@ export default function createModelHeroPage() {
         </form>
         <div class='templates-section'>
             <div class='switch-template last clickable'>${getSVG('caret-right-fill')}</div>
-            <div id='display-templates'>${
-                templates.map(e=>{
-                    return `
-                    <div class='template-card clickable'>
-                        <div class='title'>${e.name}</div>
-                        <div class='description'>${e.description}</div>
-                    </div>`
-                }).join('')
-            }</div>
+            <div id='display-templates'></div>
             <div class='switch-template next clickable'>${getSVG('caret-right-fill')}</div>
         </div>
     </div>`
@@ -49,6 +62,10 @@ export default function createModelHeroPage() {
     // 
     // =============================================================
 
+    templates.forEach(template => {
+        display_templates.appendChild(createTemplateCard(template));
+    })
+
     document.addEventListener("resize", windowResized);
     display_templates.addEventListener('wheel', scrollTemplates);
     document.querySelector('.templates-section .switch-template.next').onclick = () => adjustScroll(true)
@@ -56,11 +73,10 @@ export default function createModelHeroPage() {
 
     calculateWithInfo();
 
-    const template_cards = Array.from(document.querySelectorAll('#display-templates .template-card'));
-    const append_first_list = template_cards.slice(-2).map(e=>e.cloneNode(true));
+    const append_first_list = templates.slice(-2).map(e=>createTemplateCard(e));
 
     const append_first = append_first_list[0];
-    const append_last = template_cards[0].cloneNode(true);
+    const append_last = createTemplateCard(templates[0]);
 
     display_templates.append(append_last);
     display_templates.firstElementChild.before(...append_first_list);
@@ -95,6 +111,15 @@ export default function createModelHeroPage() {
     };
 }
 
+function createTemplateCard(template) {
+    const {name, description} = template;
+    const card = document.createElement('div');
+    card.className = 'template-card clickable';
+    card.innerHTML = `<div class="title">${name}</div><div class='description'>${description}</div>`
+    card.onclick = () => showTemplatePopup(template)
+    return card;
+}
+
 function submitSearchTemplate(evt) {
     evt.preventDefault();
 
@@ -124,4 +149,39 @@ const windowResized = debounce(calculateWithInfo , 20);
 
 function scrollTemplates(evt) {
     adjustScroll(evt.deltaY > 0)
+}
+
+function showTemplatePopup(template) {
+    selected_template_popup.innerHTML = ''
+
+    const template_main = document.createElement('div');
+    template_main.onclick = evt => evt.stopPropagation();
+    template_main.className = 'show-template-main';
+
+    template_main.insertAdjacentHTML('beforeend', `<div class='template-name'>${template.name}</div>`);
+
+    const template_block = document.createElement('div');
+    template_block.className = 'template-block'
+    template.modules.forEach(module => {
+        const part_card = document.createElement('div');
+        part_card.className = 'card';
+        part_card.textContent = module;
+        template_block.appendChild(part_card)
+    })
+
+    template_main.appendChild(template_block);
+
+    const select_template_btn = document.createElement('div');
+    select_template_btn.className = 'select-template-btn button clickable';
+    select_template_btn.textContent = 'Select This Template';
+    select_template_btn.onclick = () => {
+        updateSelectedTemplate && updateSelectedTemplate(template.name)
+        showMessage(`Template "${template.name}" selected for training`);
+        selected_template_controller.close();
+    }
+
+    template_main.appendChild(select_template_btn);
+    selected_template_popup.appendChild(template_main);
+
+    selected_template_controller.showModal();
 }

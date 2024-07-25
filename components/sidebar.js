@@ -4,7 +4,7 @@ import createAccountPage from "./account-page/index.js";
 
 const pages = [
     { name: 'chat', svgName: 'chat-dots-fill' },
-    { name: 'model-hero', svgName: 'hero' },
+    // { name: 'model-hero', svgName: 'hero' },
     { name: 'training' },
     { name: 'account', svgName: 'person-fill', not_page: true },
     { name: 'info', svgName: 'info-circle-fill', not_page: true }
