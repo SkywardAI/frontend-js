@@ -167,3 +167,47 @@
     height: calc(100% - 50px);
     overflow-y: auto;
 }
+
+/* 
+=====================================================
+
+                    SHOW TEMPLATE
+
+=====================================================
+*/
+
+.show-template-main {
+    width: 500px;
+    height: 70%;
+    margin: auto;
+    margin-top: 5%;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.show-template-main .template-name {
+    font-size: 30px;
+    text-align: center;
+    height: 40px;
+}
+
+.show-template-main .template-block {
+    height: calc(100% - 130px);
+    margin-top: 20px;
+    width: 100%;
+    padding: 20px;
+    border: 2px inset;
+    border-radius: 10px;
+}
+
+.show-template-main .select-template-btn {
+    height: 45px;
+    width: fit-content;
+    padding: 0px 20px;
+    align-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    margin: auto;
+    margin-top: 20px;
+}
