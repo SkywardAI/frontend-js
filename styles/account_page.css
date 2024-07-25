@@ -146,8 +146,6 @@
     width: var(--item-width);
     height: calc(var(--item-height) - 3px);
     border-radius: 16px;
-    background-color: dodgerblue;
-    color: white;
     box-sizing: border-box;
     border: none;
     font-size: 18px;
@@ -160,6 +158,10 @@
 
 .input-details-main .function-btn.reverse-color {
     background-color: white;
-    border: 1px solid dodgerblue;
-    color: dodgerblue;
+    border: 1px solid var(--button-color);
+    color: var(--button-color);
+}
+.input-details-main .function-btn.reverse-color:hover {
+    border-color: var(--button-change-color);
+    color: var(--button-change-color);
 }

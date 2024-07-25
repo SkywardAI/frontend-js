@@ -31,7 +31,7 @@ function generateRequest(url, options={}) {
     if(options.method && /^(POST|PATCH)$/i.test(options.method)) {
         headers['Content-Type'] = 'application/json'
     }
-    if(/^(chat|accounts|ds).*$/.test(url) && session_id) {
+    if(/^(chat|accounts|ds|nn).*$/.test(url) && session_id) {
         headers['Authorization'] = `Bearer ${session_id}`
     }
 

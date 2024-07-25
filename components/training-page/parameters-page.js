@@ -40,7 +40,7 @@ const quick_edit = [
 const [ advanced_settings_dialog, controller ] = createDialog();
 let main_form, init = false, showTrainingPage;
 
-export default function loadParametersPage(main, switchPage) {
+export default function loadParametersPage(main, switchPage, models, getModelName, setSelectedModel) {
     showTrainingPage = switchPage;
     main.innerHTML = `
     <form id='training-params'>
@@ -58,13 +58,14 @@ export default function loadParametersPage(main, switchPage) {
             <div>
                 <div class='title'>Select Base Model</div>
                 <select class='clickable' name='select-model'>
-                    <option value='default model'>Default Model</option>
+                    <option value=''>-- Please Select a Model --</option>
+                    ${models.map(({name})=>{return `<option value='${name}'>${name}</option>`})}
                 </select>
             </div>
             <div>
                 <div class='title'>Select Dataset</div>
                 <select class='clickable' name='select-dataset'>
-                    <option value='default dataset'>Default Dataset</option>
+                    <option value=''>Default Dataset</option>
                 </select>
             </div>
         </section>
@@ -74,15 +75,20 @@ export default function loadParametersPage(main, switchPage) {
             </div>
         </section>
         <section class='function'>
-            <button class='clickable' type='button' id='save-btn'>Save</button>
-            <button class='clickable' type='button' id='start-training-btn'>Start Training</button>
+            <button class='button' type='button' id='save-btn'>Save</button>
+            <button class='button' type='button' id='start-training-btn'>Start Training</button>
         </section>
     </form>`
 
     main_form = document.getElementById('training-params');
     document.getElementById('start-training-btn').onclick = startTraining;
 
+    main_form['select-model'].value = getModelName()
+
     document.getElementById('save-btn').onclick = () => {
+        const entry_values = getEntryValues();
+        setSelectedModel(entry_values['select-model'])
+        showMessage('Settings saved')
         console.log(getEntryValues());
     }
 
@@ -235,7 +241,6 @@ function getEntryValues() {
     };
 
     return values;
-
 }
 
 

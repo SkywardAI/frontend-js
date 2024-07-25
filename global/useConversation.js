@@ -49,7 +49,7 @@ async function startNewConversation() {
     addHistory({
         id: currentConversation.id,
         name: currentConversation.name,
-        createdAt: new Date().toUTCString()
+        createdAt: new Date()
     })
     updateAll(currentConversation);
 }

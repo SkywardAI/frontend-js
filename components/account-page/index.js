@@ -87,12 +87,12 @@ function createInputDetailsPage() {
     // buttons
     const submit_btn = document.createElement('button');
     submit_btn.type = 'submit';
-    submit_btn.className = 'function-btn clickable';
+    submit_btn.className = 'function-btn button';
     input_details_main.appendChild(submit_btn);
 
     const functional_btn = document.createElement('button');
     functional_btn.type = 'button';
-    functional_btn.className = 'function-btn reverse-color clickable';
+    functional_btn.className = 'function-btn clickable reverse-color';
     input_details_main.appendChild(functional_btn);
 
     function updateBtnText() {
