@@ -33,7 +33,7 @@ export default function normalSettigSection(type, title, callback = null, ...arg
         } else if(type === 'button') {
             input_like.value = args[0];
             input_like.onclick = args[1];
-            input_like.classList.add('clickable')
+            input_like.classList.add('button')
         }
     }
     

@@ -62,14 +62,12 @@
 }
 
 .chat-settings .setting-section input[type="button"] {
-    color: white;
-    background-color: dodgerblue;
+    background-color: var(--button-color);
     border: none;
     font-size: 16px;
-    transition-duration: .3s;
 }
 .chat-settings .setting-section input[type="button"]:hover {
-    background-color: rgb(0, 113, 226);
+    background-color: var(--button-change-color);
 }
 
 .chat-settings .setting-section input[type="text"]:focus,

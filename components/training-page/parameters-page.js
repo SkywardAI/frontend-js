@@ -74,8 +74,8 @@ export default function loadParametersPage(main, switchPage) {
             </div>
         </section>
         <section class='function'>
-            <button class='clickable' type='button' id='save-btn'>Save</button>
-            <button class='clickable' type='button' id='start-training-btn'>Start Training</button>
+            <button class='button' type='button' id='save-btn'>Save</button>
+            <button class='button' type='button' id='start-training-btn'>Start Training</button>
         </section>
     </form>`
 

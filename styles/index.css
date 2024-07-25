@@ -1,6 +1,8 @@
 * {
     --gray-bg: rgb(230, 230, 230);
     --transparent-gray-bg: rgba(230, 230, 230, 0.6);
+    --button-color: dodgerblue;
+    --button-change-color: rgb(0, 113, 226);
     font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
 
     /* scrollbar-width: thin; */
@@ -40,8 +42,19 @@ svg {
     display: block;
 }
 
+.button,
 .clickable:hover {
     cursor: pointer;
+}
+
+.button {
+    background-color: var(--button-color);
+    color: white;
+    transition-duration: .3s;
+}
+
+.button:hover {
+    background-color: var(--button-change-color);
 }
 
 #sidebar {

@@ -248,13 +248,7 @@
     height: 50px;
     border: none;
     border-radius: 10px;
-    background-color: dodgerblue;
-    color: white;
     font-size: 20px;
-    transition-duration: .5s;
-}
-#training-params section.function button:hover {
-    background-color: rgb(0, 113, 226);
 }
 #training-params section.function button:first-child { margin-top: auto; margin-bottom: 10%; }
 #training-params section.function button:last-child { margin-bottom: auto; }
