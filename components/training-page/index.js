@@ -1,6 +1,8 @@
 // const dataset_options = []
 // const model_options = []
 
+import { loadDefaultPage } from "../../global/switchPage.js";
+import useUser from "../../global/useUser.js";
 import showMessage from "../../tools/message.js";
 import request from "../../tools/request.js";
 import createModelHeroPage from "../model-hero-page/index.js";
@@ -49,7 +51,17 @@ function switchPage(page) {
     current_page = page;
 }
 
+let logged_in;
+const { componentReMount, componetDismount } = useUser(user=>{
+    logged_in = user.logged_in;
+    if(!logged_in) {
+        loadDefaultPage();
+    }
+})
+
 export default function createTrainingPage() {
+    componentReMount();
+
     document.getElementById("main").innerHTML = `
     <div class='training-main'>
         <div id='training-tabs'></div>
@@ -81,5 +93,5 @@ export default function createTrainingPage() {
             switchPage(loaded_page || pages[0].index);
         }
     })
-    return null;
+    return componetDismount;
 }
