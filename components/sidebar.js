@@ -1,6 +1,7 @@
 import createInfoPage from "./info-page.js";
 import getSVG from "../tools/svgs.js";
 import createAccountPage from "./account-page/index.js";
+import switchSelectedPage from '../global/switchPage.js'
 
 const pages = [
     { name: 'chat', svgName: 'chat-dots-fill' },
@@ -10,7 +11,7 @@ const pages = [
     { name: 'info', svgName: 'info-circle-fill', not_page: true }
 ]
 
-export default function createSideBar(switchSelectedPage) {
+export default function createSideBar() {
     const sidebar = document.getElementById('sidebar');
 
     sidebar.innerHTML = `
@@ -30,6 +31,4 @@ export default function createSideBar(switchSelectedPage) {
     })
     createInfoPage();
     document.getElementById('sidebar-icon-account').onclick = createAccountPage;
-
-    switchSelectedPage(pages[0].name);
 }
