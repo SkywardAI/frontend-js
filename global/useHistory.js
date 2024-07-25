@@ -34,7 +34,7 @@ async function requestUpdateHistory() {
 }
 
 function addHistory(new_ticket) {
-    history.unshift(new_ticket);
+    history.unshift({...new_ticket, createdAt: formatDateTime(new_ticket.createdAt)});
     updateAll(history);
 }
 
