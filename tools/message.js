@@ -17,9 +17,7 @@ message_dialog.show();
  * Display a notification with given type on top-right corner
  * @param {String | any[]} message 
  *  The message to show, can be a `string` or an array with `string` or/and `HTMLElement`.  
- *  **Note:**  
-    *  If pass a `string`, it will be parsed to HTML;  
-    *  If pass an `array` with `string`, strings in that array won't be parsed.
+ *  **Note:** `string` will not be parsed, please add `HTMLElement` if you want to output html format.
  * @param {messageOptions} options - Options of showing messages
  */
 export default function showMessage(message, options = {}) {
@@ -46,11 +44,10 @@ export default function showMessage(message, options = {}) {
     const message_text = document.createElement('div');
     message_text.className = 'message-text';
     message_elem.appendChild(message_text);
-    if(typeof message === 'string') {
-        message_text.innerHTML = message;
-    } else if(Array.isArray(message)) {
-        message_text.append(...message);
+    if(!Array.isArray(message)) {
+        message = [message]
     }
+    message_text.append(...message);
     
     message_elem.style.animationDuration = `${animation_duration}ms`
     message_dialog.appendChild(message_elem);

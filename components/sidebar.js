@@ -1,17 +1,16 @@
 import createInfoPage from "./info-page.js";
 import getSVG from "../tools/svgs.js";
 import createAccountPage from "./account-page/index.js";
-import switchSelectedPage from '../global/switchPage.js'
 
 const pages = [
     { name: 'chat', svgName: 'chat-dots-fill' },
     // { name: 'model-hero', svgName: 'hero' },
-    { name: 'training' },
+    // { name: 'training' },
     { name: 'account', svgName: 'person-fill', not_page: true },
     { name: 'info', svgName: 'info-circle-fill', not_page: true }
 ]
 
-export default function createSideBar() {
+export default function createSideBar(switchSelectedPage) {
     const sidebar = document.getElementById('sidebar');
 
     sidebar.innerHTML = `

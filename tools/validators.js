@@ -4,7 +4,7 @@ export const username_not_valid = 'Username should includes only letters, number
 
 export function validateEmail(string) {
     return (
-        /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(string)
+        /^[a-zA-Z0-9_-][.a-zA-Z0-9_-]+[a-zA-Z0-9_-]@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(string)
     )
 }
 
