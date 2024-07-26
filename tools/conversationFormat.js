@@ -49,6 +49,9 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
                 case 'inline-code': 
                     plain_text_elems.push(createElement('span', group_1 || group_2, { className: 'inline-code' }))
                     break;
+                case 'hyperlink':
+                    plain_text_elems.push(createElement('a', group_1, { href: group_2, target: '_blank' }))
+                    break;
                 default:
                     return '';
             }
@@ -93,6 +96,7 @@ export function formatMarkdown(str, target_elem, pending_elem, end_special_block
             .replaceAll(/__(.+?)__/g, parseSingleLine('italic'))
             .replaceAll(/^(\*|-){3,}$/g, parseSingleLine('hr'))
             .replaceAll(/``(.+?)``|`(.+?)`/g, parseSingleLine('inline-code'))
+            .replaceAll(/\[([^\]]*)\]\(([^)]*)\)/g, parseSingleLine('hyperlink'))
             .replace(/<\|end\|>$/, '');
 
             const block = document.createElement('div');
