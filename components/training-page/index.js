@@ -1,7 +1,7 @@
 // const dataset_options = []
 // const model_options = []
 
-import { loadDefaultPage } from "../../global/switchPage.js";
+// import { loadDefaultPage } from "../../global/switchPage.js";
 import useUser from "../../global/useUser.js";
 import showMessage from "../../tools/message.js";
 import request from "../../tools/request.js";
@@ -14,7 +14,7 @@ const pages = [
     {index: 'template', title: 'Find Models'},
     {index: 'parameters', title: 'Start Training'},
     {index: 'training-visualization', title: 'Training Visualization'},
-    {index: 'faq', title: 'FAQ'},
+    // {index: 'faq', title: 'FAQ'},
 ]
 
 let  training_page_main, current_page = '',
@@ -51,15 +51,16 @@ function switchPage(page) {
     current_page = page;
 }
 
-let logged_in;
+let logged_in, loadDefaultPage;
 const { componentReMount, componetDismount } = useUser(user=>{
     logged_in = user.logged_in;
     if(!logged_in) {
-        loadDefaultPage();
+        loadDefaultPage && loadDefaultPage();
     }
 })
 
-export default function createTrainingPage() {
+export default function createTrainingPage(load_default_page) {
+    loadDefaultPage = load_default_page;
     componentReMount();
 
     document.getElementById("main").innerHTML = `
