@@ -3,7 +3,7 @@ import createChatMain from "./chatMain.js";
 import createChatHistory from "./history.js";
 import createChatSettingsPage from "./settings.js";
 
-const [settings_main, { toggleModal }] = createDialog();
+const [settings_main, { toggleModal, close }] = createDialog();
 
 export default function createChatPage() {
     const chatPage = document.createElement('div');
@@ -19,7 +19,7 @@ export default function createChatPage() {
 
     dismount_components.push(createChatHistory(chatPage));
     dismount_components.push(createChatMain(chatPage, toggleExpand, toggleModal));
-    createChatSettingsPage(settings_main);
+    createChatSettingsPage(settings_main, close);
 
     return () => {
         dismount_components.forEach(e=>e());

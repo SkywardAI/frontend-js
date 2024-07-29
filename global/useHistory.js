@@ -38,6 +38,11 @@ function addHistory(new_ticket) {
     updateAll(history);
 }
 
+function removeHistory(id) {
+    history.splice(history.findIndex(e=>e.id === id), 1);
+    updateAll(history);
+}
+
 async function updateHistoryName(id, name) {
     history[history.findIndex(h=>h.id === id)].name = name;
     const { http_error } = await request('chat/session', {
@@ -72,7 +77,8 @@ export default function useHistory(updated = null) {
     updated && updated(history);
 
     return { 
-        requestUpdateHistory, addHistory, getHistory, updateHistoryName, updateHistoryInfo,
+        requestUpdateHistory, addHistory, removeHistory,
+        getHistory, updateHistoryName, updateHistoryInfo,
         componetDismount: dismount(mount_key), componentReMount
     }
 }

@@ -17,7 +17,7 @@ const conversation_histories = {}
 let currentUser;
 
 const { onmount, remount, dismount, updateAll } = createHook();
-const { addHistory, updateHistoryName } = useHistory(h=>{
+const { addHistory, removeHistory, updateHistoryName } = useHistory(h=>{
     if(currentConversation.id) {
         if(!h.filter(e=>e.id === currentConversation.id).length) {
             currentConversation = {
@@ -52,6 +52,25 @@ async function startNewConversation() {
         createdAt: new Date()
     })
     updateAll(currentConversation);
+}
+
+async function deleteConversation() {
+    const { http_error } = await request(`chat/session/${currentConversation.id}`, {
+        method: 'DELETE'
+    })
+    if(!http_error) {
+        removeHistory(currentConversation.id);
+        currentConversation = {
+            id: null,
+            pending: false,
+            name: '',
+            session_type: '',
+            dataset_name: '',
+            history: []
+        }
+        updateAll(currentConversation);
+    }
+    return !http_error;
 }
 
 function togglePending() {
@@ -98,7 +117,7 @@ export default function useConversation(updated) {
     updated && updated(currentConversation);
 
     return { 
-        selectConversation, startNewConversation,
+        selectConversation, startNewConversation, deleteConversation,
         sendMessage, togglePending, rename, updateConversationInfo,
         componetDismount:dismount(mount_key), componentReMount
     }

@@ -66,8 +66,15 @@
     border: none;
     font-size: 16px;
 }
-.chat-settings .setting-section input[type="button"]:hover {
+.chat-settings .setting-section:not(.dangerous) input[type="button"]:hover {
     background-color: var(--button-change-color);
+}
+
+.confirm-delete-session .dangerous-btn,
+.setting-section.dangerous > input[type="button"] {
+    background-color: red;
+    color: white;
+    font-size: 16px;
 }
 
 .chat-settings .setting-section input[type="text"]:focus,
@@ -173,4 +180,24 @@
     width: 30px;
     height: 30px;
     animation: rotateLoading 1s linear infinite;
+}
+
+.confirm-delete-session {
+    background-color: white;
+    border-radius: 10px;
+    margin: auto;
+    margin-top: 35vh;
+    padding: 30px;
+    width: fit-content;
+}
+
+.confirm-delete-session > div {
+    width: 160px;
+    padding: 0px 20px;
+    height: 40px;
+    border-radius: 10px;
+    align-content: center;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
 }
