@@ -16,6 +16,7 @@ import rangeSettingSection from './range-setting-section.js';
 
 let current_conversation = {}, user_id = null;
 let rag_dataset_options = {};
+let closeSetting;
 
 // ===================================================
 //
@@ -29,6 +30,30 @@ show_dataset_loading.className = 'show-dataset-loading';
 show_dataset_loading.innerHTML = 
 `${getSVG('arrow-clockwise')}<div>Dataset loading, please wait...</div>`
 upload_dataset_cover.appendChild(show_dataset_loading);
+
+const [confirm_delete_session_cover, confirm_delete_session_controller] = createDialog(false);
+const confirm_delete_session_main = document.createElement('div');
+confirm_delete_session_main.className = 'confirm-delete-session';
+const cancel_btn = document.createElement('div');
+cancel_btn.className = 'button';
+cancel_btn.textContent = 'Cancel'
+cancel_btn.onclick = confirm_delete_session_controller.close;
+const confirm_delete_btn = document.createElement('div');
+confirm_delete_btn.className = 'dangerous-btn clickable';
+confirm_delete_btn.textContent = 'Confirm Delete'
+confirm_delete_btn.onclick = async ()=>{
+    const session_name = current_conversation.name;
+    if(await deleteConversation()) {
+        showMessage(
+            `Session "${session_name}" successfully deleted!`, 
+            { type: 'success' }
+        );
+        confirm_delete_session_controller.close();
+        closeSetting();
+    }
+}
+confirm_delete_session_main.append(confirm_delete_btn, cancel_btn);
+confirm_delete_session_cover.appendChild(confirm_delete_session_main)
 
 const session_settings = document.createElement('div');
 session_settings.className = 'session-settings'
@@ -92,6 +117,13 @@ const [submit_dataset_btn, {
     'Confirm', submitDatasetOptions
 )
 submit_dataset_btn.classList.add('rag-option','hide-on-no-change')
+
+const [delete_session_btn] = normalSettingSection(
+    'button', 'Delete Session', ()=>{}, 
+    'Delete This Session', 
+    confirm_delete_session_controller.showModal
+)
+delete_session_btn.classList.add('dangerous');
 
 // ===================================================
 //
@@ -166,7 +198,7 @@ useUser(user=>{
 
 const { updateHistoryInfo } = useHistory();
 
-const { rename } = useConversation(conversation=>{
+const { rename, deleteConversation } = useConversation(conversation=>{
     current_conversation = conversation;
     setSessionName(conversation.name)
     session_settings.classList.toggle(
@@ -201,6 +233,7 @@ session_settings.appendChild(dataset_list_elem);
 session_settings.appendChild(dataset_range_elem);
 session_settings.appendChild(submit_dataset_btn);
 session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option hide-on-no-change'>");
+session_settings.appendChild(delete_session_btn)
 
 // ===================================================
 //
@@ -208,6 +241,7 @@ session_settings.insertAdjacentHTML("beforeend", "<hr class='rag-option hide-on-
 //
 // ===================================================
 
-export default function createSessionSettings(main) {
+export default function createSessionSettings(main, close_setting) {
+    closeSetting = close_setting;
     main.appendChild(session_settings);
 }
