@@ -5,8 +5,7 @@ const defaultSettings = {
     temperature: 0.2,
     top_k: 40,
     top_p: 0.9,
-    n_predict: 512,
-    collection_name: 'collection_name'
+    n_predict: 512
 }
 
 const savedSettings = localStorage.getItem('model-settings') ?
