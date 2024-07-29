@@ -185,7 +185,8 @@ async function sendMessage(message, send) {
             signal: abort_controller.signal,
             body: { 
                 sessionUuid: conversation.id || "uuid", 
-                message, ...model_settings
+                message, ...model_settings, 
+                collection_name: conversation.dataset_name
             }
         }, true)
     
