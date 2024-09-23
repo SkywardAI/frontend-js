@@ -1,7 +1,7 @@
-## Frontend for SkywardAI
+## Rebel
 [![Linter and Builder checker 🚀](https://github.com/SkywardAI/rebel/actions/workflows/linter-builder-checker.yml/badge.svg)](https://github.com/SkywardAI/rebel/actions/workflows/linter-builder-checker.yml) [![CodeQL](https://github.com/SkywardAI/rebel/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/SkywardAI/rebel/actions/workflows/github-code-scanning/codeql) [![Release Drafter 🚀](https://github.com/SkywardAI/rebel/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/SkywardAI/rebel/actions/workflows/release-drafter.yml) [![Releasing Image 🚀](https://github.com/SkywardAI/rebel/actions/workflows/release-image.yml/badge.svg)](https://github.com/SkywardAI/rebel/actions/workflows/release-image.yml)
 
-This frontend is written by js without use any frontend frame.\
+This frontend application is written by native javascript without use any frontend frame.\
 Don't have to worry about package.json and package-lock.json, they are for linter only, see [Code Lint](#code-lint).
 
 ## Run
